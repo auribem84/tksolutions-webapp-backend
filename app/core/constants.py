@@ -1,0 +1,4 @@
+import uuid
+
+DEFAULT_ORG_ID = uuid.UUID("23158484-0000-0000-0000-000000000001")
+DEFAULT_ADMIN_EMAIL = "superadmin@tk.com"
