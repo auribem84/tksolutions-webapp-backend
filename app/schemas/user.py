@@ -1,5 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from uuid import UUID
+from typing import Optional
 
 
 class UserCreate(BaseModel):
@@ -19,3 +20,6 @@ class UserOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class UserUpdateSelf(BaseModel):
+    email: Optional[str] = None

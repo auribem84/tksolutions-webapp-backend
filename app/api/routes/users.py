@@ -70,7 +70,7 @@ def get_users(
         db.query(User)
         .join(OrganizationUser, OrganizationUser.user_id == User.id)
         .filter(
-            OrganizationUser.organization_id == current_user.organization_id
+            OrganizationUser.organization_id == current_user["organization_id"]
         )
         .all()
     )
@@ -88,7 +88,7 @@ def get_user(
         .join(OrganizationUser, OrganizationUser.user_id == User.id)
         .filter(
             User.id == user_id,
-            OrganizationUser.organization_id == current_user.organization_id
+            OrganizationUser.organization_id == current_user["organization_id"]
         )
         .first()
     )
@@ -112,7 +112,7 @@ def update_user(
         .join(OrganizationUser, OrganizationUser.user_id == User.id)
         .filter(
             User.id == user_id,
-            OrganizationUser.organization_id == current_user.organization_id
+            OrganizationUser.organization_id == current_user["organization_id"]
         )
         .first()
     )
@@ -144,7 +144,7 @@ def delete_user(
         .join(OrganizationUser)
         .filter(
             User.id == user_id,
-            OrganizationUser.organization_id == current_user.organization_id
+            OrganizationUser.organization_id == current_user["organization_id"]
         )
         .first()
     )

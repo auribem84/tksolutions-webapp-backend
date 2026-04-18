@@ -5,13 +5,16 @@ from sqlalchemy.orm import Session
 
 from app.db.session import SessionLocal
 from app.models.user import User
+from app.models.organization_user import OrganizationUser
+from app.models.role import Role
 from app.core.security import SECRET_KEY, ALGORITHM
-from app.core.constants import DEFAULT_ORG_ID
 
 security = HTTPBearer()
 
 
-# ✅ DB Dependency (define here, don't import it)
+# =========================
+# DB
+# =========================
 def get_db():
     db = SessionLocal()
     try:
@@ -20,7 +23,9 @@ def get_db():
         db.close()
 
 
-# ✅ Current User Dependency
+# =========================
+# CURRENT USER (DICT SIMPLE Y ESTABLE)
+# =========================
 def get_current_user(
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
@@ -31,25 +36,66 @@ def get_current_user(
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
         organization_id = payload.get("organization_id")
-        role_id = payload.get("role_id")
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+    if not user_id or not organization_id:
+        raise HTTPException(status_code=401, detail="Invalid token payload")
 
     user = db.query(User).filter(User.id == user_id).first()
 
     if not user:
         raise HTTPException(status_code=401, detail="User not found")
 
-    # Attach dynamic attributes
-    user.organization_id = organization_id
-    user.role_id = role_id
+    org_user = db.query(OrganizationUser).filter(
+        OrganizationUser.user_id == user_id,
+        OrganizationUser.organization_id == organization_id
+    ).first()
 
-    return user
+    if not org_user:
+        raise HTTPException(status_code=403, detail="User not in organization")
 
-def require_default_admin(current_user=Depends(get_current_user)):
-    if str(current_user.organization_id) != str(DEFAULT_ORG_ID):
+    role = db.query(Role).filter(Role.id == org_user.role_id).first()
+
+    if not role:
+        raise HTTPException(status_code=500, detail="Role not found")
+
+    return {
+        "user_id": str(user.id),
+        "organization_id": str(organization_id),
+        "email": user.email,
+        "role": role.name,
+        "role_id": str(role.id)
+    }
+
+
+# =========================
+# ADMIN GUARD
+# =========================
+def require_admin(current_user=Depends(get_current_user)):
+    if current_user["role"] != "admin":
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
-            detail="Not allowed: requires default org admin"
+            detail="Admin only"
         )
+    return current_user
+
+# =========================
+# DEFAULT ORG ADMIN (SUPER ADMIN)
+# =========================
+DEFAULT_ORG_ID = "23158484-0000-0000-0000-000000000001"  # ajusta si usas otro
+
+def require_default_admin(current_user=Depends(get_current_user)):
+    if current_user["organization_id"] != DEFAULT_ORG_ID:
+        raise HTTPException(
+            status_code=403,
+            detail="Not default organization"
+        )
+
+    if current_user["role"] != "admin":
+        raise HTTPException(
+            status_code=403,
+            detail="Admin required"
+        )
+
     return current_user
