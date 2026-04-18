@@ -1,4 +1,7 @@
 from pydantic import BaseModel
+from uuid import UUID
+from typing import Optional
+from datetime import datetime
 
 
 class ServiceCreate(BaseModel):
@@ -6,8 +9,11 @@ class ServiceCreate(BaseModel):
 
 
 class ServiceOut(BaseModel):
-    id: str
+    id: UUID
+    organization_id: UUID
     name: str
-
-    class Config:
-        from_attributes = True
+    description: Optional[str]
+    status: str
+    plan: Optional[str]
+    monthly_fee: Optional[str]
+    last_activity: Optional[str]

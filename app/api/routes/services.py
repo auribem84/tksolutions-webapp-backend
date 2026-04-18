@@ -39,9 +39,23 @@ def list_services(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    return db.query(Service).filter(
+    services = db.query(Service).filter(
         Service.organization_id == current_user["organization_id"]
     ).all()
+
+    return [
+        {
+            "id": str(s.id),
+            "organization_id": str(s.organization_id),
+            "name": s.name,
+            "description": s.description,
+            "status": s.status,
+            "plan": s.plan,
+            "monthly_fee": s.monthly_fee,
+            "last_activity": s.last_activity,
+        }
+        for s in services
+    ]
 
 
 # 🔍 GET ONE
