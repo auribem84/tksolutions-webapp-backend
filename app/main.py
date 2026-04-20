@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, billings, users, services, tickets, organizations
+from app.api.routes import auth, billings, users, services, tickets, organizations, settings
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
 
@@ -33,7 +33,7 @@ app.include_router(services.router, prefix="/services", tags=["Services"])
 app.include_router(billings.router, prefix="/billing", tags=["Billing"])
 app.include_router(tickets.router, prefix="/tickets", tags=["Tickets"])
 app.include_router(organizations.router, prefix="/organizations", tags=["Organizations"])
-
+app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 
 # 🚀 STARTUP
 @app.on_event("startup")
