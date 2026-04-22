@@ -15,10 +15,26 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     -- =========================
     CREATE TABLE users (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+        -- Auth
         email VARCHAR(255) UNIQUE NOT NULL,
         hashed_password TEXT NOT NULL,
         is_active BOOLEAN DEFAULT TRUE,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+        -- User info
+        user_name VARCHAR(100) NOT NULL,
+        user_lastname VARCHAR(100) NOT NULL,
+
+        -- Audit
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        created_by UUID,
+
+        modified_at TIMESTAMP,
+        modified_by UUID,
+
+        -- Foreign keys (opcional pero recomendado)
+        CONSTRAINT fk_users_created_by FOREIGN KEY (created_by) REFERENCES users(id),
+        CONSTRAINT fk_users_modified_by FOREIGN KEY (modified_by) REFERENCES users(id)
     );
 
     -- =========================
@@ -72,6 +88,7 @@ CREATE TABLE invoices (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
     amount NUMERIC(10,2) NOT NULL,
+    description TEXT,
     status VARCHAR(50) DEFAULT 'pending',
     due_date DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -96,6 +113,7 @@ CREATE TABLE tickets (
     organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
     created_by UUID REFERENCES users(id),
     title VARCHAR(255) NOT NULL,
+    description TEXT,
     status VARCHAR(50) DEFAULT 'open',
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
@@ -108,5 +126,18 @@ CREATE TABLE ticket_messages (
     ticket_id UUID REFERENCES tickets(id) ON DELETE CASCADE,
     sender_id UUID REFERENCES users(id),
     message TEXT NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================
+-- ORGANIZATION INVITES
+-- =========================
+CREATE TABLE organization_invites (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    email VARCHAR(255) NOT NULL,
+    token VARCHAR(255) NOT NULL,
+    organization_id UUID,
+    expires_at TIMESTAMP NOT NULL,
+    used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime
 
 from app.schemas.user import UserCreate, UserUpdate, UserOut
 from app.models.user import User

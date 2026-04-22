@@ -107,8 +107,10 @@ def get_team(
     return [
         {
             "id": u.id,
-            "name": f"{u.first_name} {u.last_name}" if hasattr(u, "first_name") else u.email,
             "email": u.email,
+            "user_name": u.user_name,
+            "user_lastname": u.user_lastname,
+            "full_name": f"{u.user_name} {u.user_lastname}",
             "role": r.name,
             "status": "active",
             "last_login": "2 hours ago",

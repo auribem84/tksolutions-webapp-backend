@@ -54,5 +54,8 @@ def get_me(current_user=Depends(get_current_user), db: Session = Depends(get_db)
     return {
         "email": user.email,
         "role": current_user.get("role", "User"),
-        "organization": org.name if org else None
+        "organization": org.name if org else None,
+        "user_name": user.user_name,
+        "user_lastname": user.user_lastname,
+        "full_name": f"{user.user_name} {user.user_lastname}"
     }
