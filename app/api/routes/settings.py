@@ -6,6 +6,8 @@ from app.api.deps import get_db, get_current_user
 from app.models.user import User
 from app.models.organization import Organization
 from app.models.organization_user import OrganizationUser
+from app.models.organization_profile import OrganizationProfile
+from app.models.organization_contact import OrganizationContact
 from app.models.role import Role
 from app.schemas.user import UserOut, UserUpdateSelf
 
@@ -126,6 +128,14 @@ def get_organization(
     org_id = current_user["organization_id"]
 
     org = db.query(Organization).filter(Organization.id == org_id).first()
+    profile = db.query(OrganizationProfile).filter(
+        OrganizationProfile.organization_id == org_id
+    ).first()
+
+    contact = db.query(OrganizationContact).filter(
+        OrganizationContact.organization_id == org_id,
+        OrganizationContact.is_primary == True
+    ).first()
 
     if not org:
         raise HTTPException(status_code=404, detail="Organization not found")
@@ -133,4 +143,7 @@ def get_organization(
     return {
         "id": org.id,
         "name": org.name,
+        "status": org.status,
+        "itin": profile.itin if profile else None,
+        "contact": contact
     }

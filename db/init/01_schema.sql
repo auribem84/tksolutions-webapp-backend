@@ -7,6 +7,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
     CREATE TABLE organizations (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
         name VARCHAR(255) NOT NULL,
+        status VARCHAR(50) DEFAULT 'active',
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
 
@@ -56,6 +57,34 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
         role_id UUID REFERENCES roles(id),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         UNIQUE(user_id, organization_id)
+    );
+
+    CREATE TABLE organization_profiles (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        organization_id UUID UNIQUE REFERENCES organizations(id) ON DELETE CASCADE,
+
+        itin VARCHAR(50),
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP
+    );
+
+    CREATE TABLE organization_contacts (
+        id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+        organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
+
+        contact_name VARCHAR(255),
+        contact_lastname VARCHAR(255),
+        contact_title VARCHAR(255),
+
+        contact_email VARCHAR(255),
+        contact_phone VARCHAR(50),
+        contact_mobile VARCHAR(50),
+
+        is_primary BOOLEAN DEFAULT TRUE,
+
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP
     );
 
 -- =========================
@@ -140,4 +169,13 @@ CREATE TABLE organization_invites (
     expires_at TIMESTAMP NOT NULL,
     used BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+
+CREATE TABLE invitation_tokens (
+    id UUID PRIMARY KEY,
+    email TEXT,
+    organization_id UUID,
+    token TEXT,
+    expires_at TIMESTAMP
 );
