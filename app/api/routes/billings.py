@@ -6,9 +6,12 @@ from app.api.deps import get_db, get_current_user, require_admin
 from app.models.billing import Billing
 from app.schemas.billing import BillingCreate, BillingOut
 
-from fastapi.responses import StreamingResponse
 from io import BytesIO
-from reportlab.pdfgen import canvas
+
+from fastapi.responses import Response, StreamingResponse
+from jinja2 import Template
+from weasyprint import HTML
+from datetime import datetime
 
 router = APIRouter()
 
@@ -103,24 +106,37 @@ def download_invoice_pdf(
     if not billing:
         raise HTTPException(status_code=404, detail="Billing not found")
 
-    # 🧾 generar PDF en memoria
-    buffer = BytesIO()
-    p = canvas.Canvas(buffer)
+    # 🧠 MOCK DATA (luego lo conectamos a DB real)
+    data = {
+        "invoice_id": str(billing.id)[:8],
+        "date": datetime.utcnow().strftime("%Y-%m-%d"),
+        "due_date": "2026-05-01",
+        "customer_name": current_user["email"],
+        "customer_email": current_user["email"],
+        "payment_method": "Credit Card (Visa **** 4242)",
+        "status": billing.status,
+        "logo_url": "https://yourcdn.com/logo.png",
+        "items": [
+            {
+                "description": billing.description,
+                "quantity": 1,
+                "price": billing.amount,
+                "total": billing.amount,
+            }
+        ],
+        "total": billing.amount,
+    }
 
-    p.setTitle(f"Invoice {billing.id}")
+    # 📄 cargar template
+    with open("app/templates/invoice.html") as f:
+        template = Template(f.read())
 
-    p.drawString(100, 750, f"Invoice ID: {billing.id}")
-    p.drawString(100, 730, f"Description: {billing.description}")
-    p.drawString(100, 710, f"Amount: ${billing.amount}")
-    p.drawString(100, 690, f"Status: {billing.status}")
+    html_content = template.render(**data)
 
-    p.showPage()
-    p.save()
-
-    buffer.seek(0)
+    pdf = HTML(string=html_content).write_pdf()
 
     return StreamingResponse(
-        buffer,
+        iter([pdf]),
         media_type="application/pdf",
         headers={
             "Content-Disposition": f"attachment; filename=invoice-{billing.id}.pdf"

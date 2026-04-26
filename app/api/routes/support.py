@@ -2,19 +2,29 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, get_current_user
-from app.models.ticket import Ticket, TicketMessage
-from app.services.ticket_ref import generate_ticket_ref
+from app.models.ticket import Ticket, TicketCreate
+from app.models.ticket_message import TicketMessage
+
 
 router = APIRouter()
 
 
+# 📄 LIST SUPPORT TICKETS (ORG SAFE)
 @router.get("/")
 def get_tickets(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+    org_id = current_user.get("organization_id")
+
+    if not org_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user context (missing organization_id)"
+        )
+
     tickets = db.query(Ticket).filter(
-        Ticket.organization_id == current_user["organization_id"]
+        Ticket.organization_id == org_id
     ).all()
 
     result = []
@@ -25,14 +35,14 @@ def get_tickets(
         ).order_by(TicketMessage.created_at.asc()).all()
 
         result.append({
-            "id": t.id,                 # interno
-            "ref": t.ref,              # público TK-001
+            "id": str(t.id),
+            "ref": t.ref,
             "subject": t.subject,
             "status": t.status,
             "priority": t.priority,
             "created": t.created_at.strftime("%b %d, %Y"),
             "updated": t.updated_at.strftime("%b %d, %Y"),
-            "assignee": t.assignee or "Unassigned",
+            "assignee": t.assignee,
             "messages": [
                 {
                     "sender": m.sender,
@@ -47,19 +57,16 @@ def get_tickets(
 
 @router.post("/")
 def create_ticket(
-    data: dict,
+    data: TicketCreate,
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    if "subject" not in data:
-        return {"error": "Subject is required"}
-
     ref = generate_ticket_ref(db)
 
     ticket = Ticket(
         ref=ref,
-        subject=data["subject"],
-        priority=data.get("priority", "medium"),
+        subject=data.subject,
+        priority=data.priority or "medium",
         organization_id=current_user["organization_id"],
         status="open",
     )
@@ -70,41 +77,12 @@ def create_ticket(
 
     return {
         "id": str(ticket.id),
-        "ref": ticket.ref,
+        "ref": ticket.ref,   # 👈 esto es lo que usa el frontend
         "subject": ticket.subject,
         "status": ticket.status,
         "priority": ticket.priority,
         "created": ticket.created_at.strftime("%b %d, %Y"),
         "updated": ticket.updated_at.strftime("%b %d, %Y"),
-        "assignee": ticket.assignee or "Unassigned",
+        "assignee": ticket.assignee,
         "messages": [],
-    }
-
-
-@router.post("/{ticket_id}/messages")
-def add_message(
-    ticket_id: str,
-    data: dict,
-    db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
-):
-    ticket = db.query(Ticket).filter(Ticket.id == ticket_id).first()
-
-    if not ticket:
-        raise HTTPException(status_code=404, detail="Ticket not found")
-
-    message = TicketMessage(
-        ticket_id=ticket.id,
-        sender=current_user["email"],  # o name
-        text=data["text"],
-    )
-
-    db.add(message)
-    db.commit()
-    db.refresh(message)
-
-    return {
-        "sender": message.sender,
-        "text": message.text,
-        "time": message.created_at.strftime("%b %d, %H:%M"),
     }

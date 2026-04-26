@@ -4,8 +4,8 @@ from typing import Optional
 
 
 class TicketCreate(BaseModel):
-    title: str
-    description: Optional[str] = None
+    subject: str
+    priority: Optional[str] = "medium"
 
 
 class TicketOut(BaseModel):

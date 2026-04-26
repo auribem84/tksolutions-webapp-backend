@@ -138,24 +138,33 @@ CREATE TABLE payments (
 -- SUPPORT TICKETS
 -- =========================
 CREATE TABLE tickets (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    organization_id UUID REFERENCES organizations(id) ON DELETE CASCADE,
-    created_by UUID REFERENCES users(id),
-    title VARCHAR(255) NOT NULL,
-    description TEXT,
-    status VARCHAR(50) DEFAULT 'open',
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    ref VARCHAR(20) UNIQUE,
+
+    organization_id UUID NOT NULL,
+
+    subject VARCHAR(255) NOT NULL,
+    status VARCHAR(20) DEFAULT 'open',
+    priority VARCHAR(20) DEFAULT 'medium',
+
+    assignee VARCHAR(100) DEFAULT 'Unassigned',
+
+    created_at TIMESTAMP DEFAULT NOW(),
+    updated_at TIMESTAMP DEFAULT NOW()
 );
 
 -- =========================
 -- TICKET MESSAGES
 -- =========================
 CREATE TABLE ticket_messages (
-    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-    ticket_id UUID REFERENCES tickets(id) ON DELETE CASCADE,
-    sender_id UUID REFERENCES users(id),
-    message TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+
+    ticket_id UUID NOT NULL,
+
+    sender VARCHAR(100),
+    text TEXT NOT NULL,
+
+    created_at TIMESTAMP DEFAULT NOW()
 );
 
 -- =========================
@@ -179,3 +188,29 @@ CREATE TABLE invitation_tokens (
     token TEXT,
     expires_at TIMESTAMP
 );
+
+
+CREATE TABLE projects (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    name VARCHAR(255) NOT NULL,
+    description TEXT,
+    status VARCHAR(50) DEFAULT 'active',
+    start_date DATE,
+    due_date DATE,
+    organization_id UUID NOT NULL
+);
+
+CREATE TABLE tasks (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    title VARCHAR(255) NOT NULL,
+    status VARCHAR(50) DEFAULT 'todo',
+    assignee VARCHAR(255),
+    due_date DATE,
+    project_id UUID NOT NULL,
+
+    CONSTRAINT fk_project
+        FOREIGN KEY (project_id)
+        REFERENCES projects(id)
+        ON DELETE CASCADE
+);
+
