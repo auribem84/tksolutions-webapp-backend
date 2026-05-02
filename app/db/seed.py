@@ -45,6 +45,8 @@ def create_default_org(db: Session):
         admin_user = User(
             email=DEFAULT_ADMIN_EMAIL,
             hashed_password=hash_password("admin123"),  # change later
+            user_name="Root",
+            user_lastname="Admin",
             is_active=True,
         )
         db.add(admin_user)
