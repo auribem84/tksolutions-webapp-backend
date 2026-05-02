@@ -51,16 +51,15 @@ def create_ticket(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
-    if "subject" not in data:
-        return {"error": "Subject is required"}
-
     ref = generate_ticket_ref(db)
 
+    # 1. crear ticket SIN description
     ticket = Ticket(
         ref=ref,
         subject=data["subject"],
         priority=data.get("priority", "medium"),
         organization_id=current_user["organization_id"],
+        # created_by=current_user["email"],
         status="open",
     )
 
@@ -68,16 +67,33 @@ def create_ticket(
     db.commit()
     db.refresh(ticket)
 
+    # 2. crear primer mensaje = description
+    first_message = TicketMessage(
+        ticket_id=ticket.id,
+        sender=current_user["email"],
+        text=data.get("description", ""),
+    )
+
+    db.add(first_message)
+    db.commit()
+    db.refresh(first_message)
+
     return {
-        "id": str(ticket.id),
+        "id": ticket.id,
         "ref": ticket.ref,
         "subject": ticket.subject,
         "status": ticket.status,
         "priority": ticket.priority,
         "created": ticket.created_at.strftime("%b %d, %Y"),
         "updated": ticket.updated_at.strftime("%b %d, %Y"),
-        "assignee": ticket.assignee or "Unassigned",
-        "messages": [],
+        # "created_by": ticket.created_by,
+        "messages": [
+            {
+                "sender": first_message.sender,
+                "time": first_message.created_at.strftime("%H:%M"),
+                "text": first_message.text,
+            }
+        ],
     }
 
 
