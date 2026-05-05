@@ -18,6 +18,7 @@ origins = [
     "http://127.0.0.1:8082",
     "http://localhost:5173",
     "https://tksolutions-webapp-frontend.onrender.com",
+    "https://my.teknowsolutions.com", 
 ]
 
 app.add_middleware(
