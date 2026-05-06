@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import List
+from typing import List, Optional
 from uuid import UUID
 from datetime import date
 
@@ -26,3 +26,28 @@ class ProjectOut(BaseModel):
 
     class Config:
         from_attributes = True
+
+class TaskCreate(BaseModel):
+    title: str
+    description: Optional[str] = None
+    status: str = "todo"
+    assignee: Optional[str] = None
+    due_date: Optional[date] = None
+
+class ProjectWithTasksCreate(BaseModel):
+    name: str
+    description: Optional[str] = None
+    status: str = "active"
+    start_date: Optional[date] = None
+    due_date: Optional[date] = None
+    organization_id: str
+    tasks: List[TaskCreate] = []
+
+class ProjectCreate(BaseModel):
+    name: str
+    description: Optional[str]
+    status: str
+    start_date: Optional[date]
+    due_date: Optional[date]
+    organization_id: UUID
+    tasks: List[TaskCreate]
