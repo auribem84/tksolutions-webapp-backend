@@ -8,7 +8,7 @@ from app.models.organization import Organization
 from app.models.user import User
 from app.models.invitation import Invitation
 from app.schemas.bootstrap import BootstrapRequest
-from app.core.security import get_password_hash
+from app.core.security import hash_password as get_password_hash
 from app.services.email_service import send_invitation_email
 
 router = APIRouter()
