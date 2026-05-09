@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from uuid import uuid4
 from datetime import datetime, timedelta
 
-from app.db.session import get_db
+from app.api.deps import get_db
 from app.models.invitation import Invitation
 from app.schemas.invitation import InvitationCreate
 from app.services.email_service import send_invitation_email
