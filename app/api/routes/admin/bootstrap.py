@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from app.api.deps import get_db
 from app.models.organization import Organization
 from app.models.user import User
-from app.core.security import get_password_hash  # ajusta a tu proyecto
+# from app.core.security import get_password_hash  # ajusta a tu proyecto
 from app.models.invitation import Invitation
 from app.services.email_service import send_invitation_email
 
