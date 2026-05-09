@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 
 from app.api.deps import get_db
 from app.models.invitation import Invitation
-from app.schemas.invitation import InvitationCreate
+from app.schemas.invitation import InvitationCreate, InvitationAccept
 from app.services.email_service import send_invitation_email
 
 router = APIRouter()
