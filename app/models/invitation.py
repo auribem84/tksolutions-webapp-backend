@@ -12,7 +12,7 @@ class Invitation(Base):
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
     email = Column(String, nullable=False)
-    role = Column(String, nullable=False, default="admin")
+    role = Column(String, nullable=False, default="user")
 
     token = Column(String, nullable=False, unique=True)
 
