@@ -20,13 +20,13 @@ def bootstrap_organization(
     db: Session = Depends(get_db),
 ):
 
-    # 🧠 1. prevent double bootstrap (SaaS safety)
-    existing = db.query(Organization).first()
-    if existing:
-        return {
-            "message": "Organization already exists",
-            "organization_id": str(existing.id),
-        }
+    # # 🧠 1. prevent double bootstrap (SaaS safety)
+    # existing = db.query(Organization).first()
+    # if existing:
+    #     return {
+    #         "message": "Organization already exists",
+    #         "organization_id": str(existing.id),
+    #     }
 
     # 🏢 2. create org
     org = Organization(

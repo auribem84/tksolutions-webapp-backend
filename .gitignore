@@ -19,3 +19,4 @@ __pycache__/
 # Archive generados
 archive/
 secrets.toml
+03.scripts.sql
