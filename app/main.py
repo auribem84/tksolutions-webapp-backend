@@ -44,7 +44,7 @@ app.include_router(invitations.router, prefix="/admin/invitations", tags=["Admin
 app.include_router(billing.router, prefix="/admin/billing", tags=["Admin"])
 app.include_router(projects.router, prefix="/projects", tags=["Projects"])
 app.include_router(admin_projects.router, prefix="/admin/projects", tags=["Admin"])
-app.include_router(bootstrap.router, prefix="/admin/bootstrap", tags=["admin"])
+app.include_router(bootstrap.router, prefix="/admin", tags=["admin"])
 
 # 🚀 STARTUP
 @app.on_event("startup")
