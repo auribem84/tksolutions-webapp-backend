@@ -214,3 +214,13 @@ CREATE TABLE tasks (
         ON DELETE CASCADE
 );
 
+CREATE TABLE invitations (
+    id UUID PRIMARY KEY,
+    email TEXT NOT NULL,
+    role TEXT NOT NULL,
+    token TEXT UNIQUE NOT NULL,
+    organization_id UUID NOT NULL,
+    accepted BOOLEAN DEFAULT false,
+    expires_at TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT now()
+);

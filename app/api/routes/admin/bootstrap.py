@@ -40,6 +40,8 @@ def bootstrap_organization(
     db.add(org)
     db.flush()
 
+    print("ORG ID:", org.id) # DEBUG
+
     # 👤 3. create admin user (SAFE FALLBACK)
     admin = User(
         id=uuid4(),
@@ -67,6 +69,8 @@ def bootstrap_organization(
     db.add(invitation)
 
     db.commit()
+
+    print("COMMITTED") # DEBUG
 
     # 📧 5. send email (non-blocking conceptually)
     invite_link = f"https://my.teknowsolutions.com/accept-invite?token={token}"
