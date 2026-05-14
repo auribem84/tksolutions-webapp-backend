@@ -135,9 +135,17 @@ def get_organization(
         OrganizationProfile.organization_id == org_id
     ).first()
 
-    contacts = db.query(OrganizationContact).filter(
+    contacts = (
+    db.query(OrganizationContact)
+    .filter(
         OrganizationContact.organization_id == org_id
-    ).all()
+    )
+    .order_by(
+        OrganizationContact.is_primary.desc(),
+        OrganizationContact.created_at.asc()
+    )
+    .all()
+    )
 
     if not org:
         raise HTTPException(
