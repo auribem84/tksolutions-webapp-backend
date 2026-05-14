@@ -8,7 +8,7 @@ from pydantic import BaseModel
 from app.api.deps import get_db, get_current_user
 
 from app.models.invoice import Invoice
-from app.models.invoice_detail import InvoiceDetail
+from app.models.invoice_details import InvoiceDetail
 from app.models.organization import Organization
 
 router = APIRouter()
