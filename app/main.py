@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.api.routes import auth, billings, users, services, tickets, organizations, settings, projects, invoices
-from app.api.routes.admin import organizations, users, invitations, billing, bootstrap
+from app.api.routes import auth, users, services, tickets, organizations, settings, projects, invoices
+from app.api.routes.admin import organizations, users, invitations, bootstrap
 from app.api.routes.admin import projects as admin_projects
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
@@ -34,7 +34,6 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(services.router, prefix="/services", tags=["Services"])
-app.include_router(billings.router, prefix="/billing", tags=["Billing"])
 app.include_router(invoices.router, prefix="/inovice", tags=["Invoices"])
 app.include_router(tickets.router, prefix="/tickets", tags=["Tickets"])
 app.include_router(organizations.router, prefix="/organizations", tags=["Organizations"])
