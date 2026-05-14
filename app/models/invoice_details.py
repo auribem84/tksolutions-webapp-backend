@@ -16,7 +16,7 @@ class InvoiceDetail(Base):
 
     invoice_id = Column(
         UUID(as_uuid=True),
-        ForeignKey("billings.id", ondelete="CASCADE"),
+        ForeignKey("invoices.id", ondelete="CASCADE"),
         nullable=False
     )
 
