@@ -224,3 +224,17 @@ CREATE TABLE invitations (
     expires_at TIMESTAMP NOT NULL,
     created_at TIMESTAMP DEFAULT now()
 );
+
+CREATE TABLE invoice_details (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+
+    invoice_id UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+
+    title VARCHAR(255) NOT NULL,
+    description TEXT,
+
+    quantity INTEGER NOT NULL DEFAULT 1,
+    unit_price NUMERIC(12,2) NOT NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
