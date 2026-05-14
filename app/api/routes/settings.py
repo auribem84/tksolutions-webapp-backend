@@ -127,23 +127,48 @@ def get_organization(
 ):
     org_id = current_user["organization_id"]
 
-    org = db.query(Organization).filter(Organization.id == org_id).first()
+    org = db.query(Organization).filter(
+        Organization.id == org_id
+    ).first()
+
     profile = db.query(OrganizationProfile).filter(
         OrganizationProfile.organization_id == org_id
     ).first()
 
-    contact = db.query(OrganizationContact).filter(
-        OrganizationContact.organization_id == org_id,
-        OrganizationContact.is_primary == True
-    ).first()
+    contacts = db.query(OrganizationContact).filter(
+        OrganizationContact.organization_id == org_id
+    ).all()
 
     if not org:
-        raise HTTPException(status_code=404, detail="Organization not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Organization not found"
+        )
 
     return {
         "id": org.id,
         "name": org.name,
         "status": org.status,
         "itin": profile.itin if profile else None,
-        "contact": contact
+
+        # primary contact
+        "contact": next(
+            (c for c in contacts if c.is_primary),
+            None
+        ),
+
+        # all contacts
+        "contacts": [
+            {
+                "id": c.id,
+                "contact_name": c.contact_name,
+                "contact_lastname": c.contact_lastname,
+                "contact_title": c.contact_title,
+                "contact_email": c.contact_email,
+                "contact_phone": c.contact_phone,
+                "contact_mobile": c.contact_mobile,
+                "is_primary": c.is_primary,
+            }
+            for c in contacts
+        ]
     }
