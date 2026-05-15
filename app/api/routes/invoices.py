@@ -157,18 +157,62 @@ def create_invoice(
     # =========================================
 
     return {
-        "message": "Invoice created successfully",
-
-        "invoice": {
-            "id": str(invoice.id),
-
-            "organization_id": str(invoice.organization_id),
-
-            "subtotal": invoice.subtotal,
-            "tax_amount": invoice.tax_amount,
-            "discount_amount": invoice.discount_amount,
-            "total": invoice.total,
-
-            "status": invoice.status
-        }
+        "id": str(invoice.id),
+        "organization_id": str(invoice.organization_id),
+        "subtotal": invoice.subtotal,
+        "tax_amount": invoice.tax_amount,
+        "discount_amount": invoice.discount_amount,
+        "total": invoice.total,
+        "status": invoice.status,
+        "items": [...]
     }
+
+
+@router.get("")
+def get_invoices(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user)
+):
+    invoices = (
+        db.query(Invoice)
+        .filter(Invoice.organization_id == current_user.organization_id)
+        .order_by(Invoice.id.desc())
+        .all()
+    )
+
+    result = []
+
+    for inv in invoices:
+
+        items = (
+            db.query(InvoiceDetail)
+            .filter(InvoiceDetail.invoice_id == inv.id)
+            .all()
+        )
+
+        result.append({
+            "id": str(inv.id),
+            "organization_id": str(inv.organization_id),
+
+            "subtotal": float(inv.subtotal or 0),
+            "tax_amount": float(inv.tax_amount or 0),
+            "discount_amount": float(inv.discount_amount or 0),
+            "total": float(inv.total or 0),
+
+            "status": inv.status,
+            "created_at": inv.created_at if hasattr(inv, "created_at") else None,
+
+            "items": [
+                {
+                    "id": str(i.id),
+                    "title": i.title,
+                    "description": i.description,
+                    "quantity": i.quantity,
+                    "unit_price": float(i.unit_price),
+                    "subtotal": float(i.subtotal),
+                }
+                for i in items
+            ]
+        })
+
+    return result

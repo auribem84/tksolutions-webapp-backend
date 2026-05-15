@@ -10,12 +10,11 @@ class Invoice(Base):
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
 
-    description = Column(String, nullable=False)
-    amount = Column(Float, nullable=False)
-    status = Column(String, default="pending")  # pending, paid, failed
+    organization_id = Column(UUID(as_uuid=True), ForeignKey("organizations.id"))
 
-    organization_id = Column(
-        UUID(as_uuid=True),
-        ForeignKey("organizations.id"),
-        nullable=False
-    )
+    subtotal = Column(Float)
+    tax_amount = Column(Float)
+    discount_amount = Column(Float)
+    total = Column(Float)
+
+    status = Column(String, default="draft")
