@@ -1,42 +1,44 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="utf-8" />
+  <meta charset="UTF-8" />
+
   <style>
     body {
-      font-family: Inter, Arial, sans-serif;
-      color: #111827;
-      margin: 40px;
+      font-family: Arial, sans-serif;
+      padding: 40px;
+      color: #111;
     }
 
     .header {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      margin-bottom: 40px;
     }
 
     .logo {
-      width: 120px;
+      width: 180px;
     }
 
-    .title {
-      font-size: 28px;
-      font-weight: 700;
-    }
-
-    .muted {
-      color: #6B7280;
-      font-size: 12px;
+    .invoice-title {
+      font-size: 32px;
+      font-weight: bold;
     }
 
     .section {
-      margin-top: 30px;
+      margin-bottom: 30px;
     }
 
-    .box {
-      padding: 16px;
-      border: 1px solid #E5E7EB;
-      border-radius: 8px;
+    .label {
+      color: #666;
+      font-size: 12px;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 14px;
+      margin-top: 4px;
     }
 
     table {
@@ -46,113 +48,121 @@
     }
 
     th {
+      background: #f4f4f4;
       text-align: left;
-      font-size: 12px;
-      color: #6B7280;
-      border-bottom: 1px solid #E5E7EB;
-      padding: 8px 0;
+      padding: 12px;
+      font-size: 13px;
     }
 
     td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .total-box {
+      margin-top: 30px;
+      width: 300px;
+      margin-left: auto;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
       padding: 10px 0;
-      border-bottom: 1px solid #F3F4F6;
-      font-size: 14px;
     }
 
-    .total {
-      text-align: right;
-      font-size: 18px;
-      font-weight: 700;
-      margin-top: 20px;
-    }
-
-    .footer {
-      margin-top: 40px;
-      font-size: 10px;
-      color: #9CA3AF;
-      border-top: 1px solid #E5E7EB;
+    .grand-total {
+      font-size: 22px;
+      font-weight: bold;
+      border-top: 2px solid #111;
       padding-top: 10px;
     }
 
-    .badge {
-      padding: 4px 8px;
-      border-radius: 6px;
+    .footer {
+      margin-top: 80px;
       font-size: 12px;
+      color: #888;
+      text-align: center;
     }
-
-    .paid { background: #DCFCE7; color: #16A34A; }
-    .pending { background: #FEF9C3; color: #CA8A04; }
-    .overdue { background: #FEE2E2; color: #DC2626; }
   </style>
 </head>
 
 <body>
 
-  <!-- HEADER -->
   <div class="header">
+
     <div>
-      <img class="logo" src="{{ logo_url }}" />
-      <div class="title">Invoice</div>
-      <div class="muted">#{{ invoice_id }}</div>
+      <img
+        src="{{ logo_path }}"
+        class="logo"
+      />
     </div>
 
-    <div class="muted">
-      Date: {{ date }}<br/>
-      Due: {{ due_date }}
+    <div class="invoice-title">
+      INVOICE
     </div>
+
   </div>
 
-  <!-- CUSTOMER -->
-  <div class="section box">
-    <strong>Bill To</strong><br/>
-    {{ customer_name }}<br/>
-    {{ customer_email }}
-  </div>
-
-  <!-- ITEMS -->
   <div class="section">
-    <table>
-      <thead>
-        <tr>
-          <th>Description</th>
-          <th>Qty</th>
-          <th>Price</th>
-          <th>Total</th>
-        </tr>
-      </thead>
 
-      <tbody>
-        {% for item in items %}
-        <tr>
-          <td>{{ item.description }}</td>
-          <td>{{ item.quantity }}</td>
-          <td>${{ item.price }}</td>
-          <td>${{ item.total }}</td>
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+    <div class="label">Invoice ID</div>
+    <div class="value">{{ invoice.id }}</div>
 
-    <div class="total">
-      Total: ${{ total }}
-    </div>
   </div>
 
-  <!-- PAYMENT INFO -->
-  <div class="section box">
-    <strong>Payment Method</strong><br/>
-    {{ payment_method }}
-  </div>
-
-  <!-- STATUS -->
   <div class="section">
-    <span class="badge {{ status }}">{{ status }}</span>
+
+    <div class="label">Status</div>
+    <div class="value">{{ invoice.status }}</div>
+
   </div>
 
-  <!-- FOOTER -->
+  <div class="section">
+
+    <div class="label">Due Date</div>
+    <div class="value">{{ invoice.due_date }}</div>
+
+  </div>
+
+  <div class="section">
+
+    <div class="label">Description</div>
+    <div class="value">
+      {{ invoice.description }}
+    </div>
+
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>{{ invoice.description }}</td>
+        <td>${{ "%.2f"|format(invoice.amount) }}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div class="total-box">
+
+    <div class="total-row grand-total">
+      <span>Total</span>
+      <span>${{ "%.2f"|format(invoice.amount) }}</span>
+    </div>
+
+  </div>
+
   <div class="footer">
-    Payment is due within 15 days. Late payments may incur fees.  
-    This invoice is system generated and does not require signature.
+    Generated by TK Solutions
   </div>
 
 </body>
