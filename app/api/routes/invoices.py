@@ -12,7 +12,7 @@ from app.models.invoice_details import InvoiceDetail
 from app.models.organization import Organization
 from app.schemas.invoice import InvoiceCreate, InvoiceOut
 
-router = APIRouter(tags=["invoices"])
+router = APIRouter()
 
 # =========================================
 # LIST INVOICES (ORG SAFE - FIXED)
