@@ -100,3 +100,72 @@ def create_invoice(
         "due_date": str(invoice.due_date) if invoice.due_date else None,
         "created_at": invoice.created_at.isoformat() if invoice.created_at else None,
     }
+
+
+# =========================================
+# INVOICE STATS
+# =========================================
+
+@router.get("/stats")
+def get_invoice_stats(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    org_id = current_user.get("organization_id")
+
+    if not org_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user context"
+        )
+
+    # =========================================
+    # CURRENT MONTH
+    # =========================================
+
+    now = datetime.utcnow()
+
+    current_month_invoices = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        func.extract("month", Invoice.created_at) == now.month,
+        func.extract("year", Invoice.created_at) == now.year,
+    ).scalar()
+
+    # =========================================
+    # OUTSTANDING
+    # =========================================
+
+    outstanding = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        Invoice.status == "pending"
+    ).scalar()
+
+    # =========================================
+    # PAID
+    # =========================================
+
+    paid = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        Invoice.status == "paid"
+    ).scalar()
+
+    # =========================================
+    # TOTAL COUNT
+    # =========================================
+
+    total_invoices = db.query(Invoice).filter(
+        Invoice.organization_id == org_id
+    ).count()
+
+    return {
+        "current_month": float(current_month_invoices or 0),
+        "outstanding": float(outstanding or 0),
+        "paid": float(paid or 0),
+        "total_invoices": total_invoices,
+    }
