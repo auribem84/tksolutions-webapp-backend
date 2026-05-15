@@ -69,3 +69,7 @@ def startup_event():
         db.commit()
     finally:
         db.close()
+
+@app.get("/health")
+def health():
+    return {"status": "ok"}
