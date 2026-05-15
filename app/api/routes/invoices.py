@@ -15,25 +15,59 @@ from app.schemas.invoice import InvoiceCreate, InvoiceOut
 router = APIRouter(tags=["invoices"])
 
 # =========================================
-# GET INVOICES (FRONTEND CONSUMES THIS)
+# LIST INVOICES (ORG SAFE - FIXED)
 # =========================================
-
-@router.get("")
+@router.get("/")
 def get_invoices(
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
-    if not current_user:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+    org_id = current_user.get("organization_id")
 
-    if not hasattr(current_user, "organization_id"):
-        raise HTTPException(status_code=400, detail="Missing organization_id")
+    if not org_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user context (missing organization_id)"
+        )
 
     invoices = db.query(Invoice).filter(
-        Invoice.organization_id == current_user.organization_id
-    ).all()
+        Invoice.organization_id == org_id
+    ).order_by(Invoice.created_at.desc()).all()
 
-    return invoices
+    result = []
+
+    for inv in invoices:
+
+        items = db.query(InvoiceDetail).filter(
+            InvoiceDetail.invoice_id == inv.id
+        ).all()
+
+        result.append({
+            "id": str(inv.id),
+            "organization_id": str(inv.organization_id),
+
+            "subtotal": float(inv.subtotal or 0),
+            "tax_amount": float(inv.tax_amount or 0),
+            "discount_amount": float(inv.discount_amount or 0),
+            "total": float(inv.total or 0),
+
+            "status": inv.status,
+            "created_at": inv.created_at.strftime("%b %d, %Y") if inv.created_at else None,
+
+            "items": [
+                {
+                    "id": str(i.id),
+                    "title": i.title,
+                    "description": i.description,
+                    "quantity": i.quantity,
+                    "unit_price": float(i.unit_price),
+                    "subtotal": float(i.subtotal),
+                }
+                for i in items
+            ],
+        })
+
+    return result
 
 
 # =========================================
