@@ -17,80 +17,70 @@ router = APIRouter()
 # =========================================
 # LIST INVOICES (ORG SAFE - FIXED)
 # =========================================
-@router.get("/")
+@router.get("/", response_model=List[InvoiceOut])
 def get_invoices(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
+
     org_id = current_user.get("organization_id")
 
     if not org_id:
         raise HTTPException(
             status_code=401,
-            detail="Invalid user context (missing organization_id)"
+            detail="Invalid user context"
         )
 
     invoices = db.query(Invoice).filter(
         Invoice.organization_id == org_id
     ).order_by(Invoice.created_at.desc()).all()
 
-    result = []
-
-    for inv in invoices:
-
-        items = db.query(InvoiceDetail).filter(
-            InvoiceDetail.invoice_id == inv.id
-        ).all()
-
-        result.append({
-            "id": str(inv.id),
-            "organization_id": str(inv.organization_id),
-
-            "subtotal": float(inv.subtotal or 0),
-            "tax_amount": float(inv.tax_amount or 0),
-            "discount_amount": float(inv.discount_amount or 0),
-            "total": float(inv.total or 0),
-
-            "status": inv.status,
-            "created_at": inv.created_at.strftime("%b %d, %Y") if inv.created_at else None,
-
-            "items": [
-                {
-                    "id": str(i.id),
-                    "title": i.title,
-                    "description": i.description,
-                    "quantity": i.quantity,
-                    "unit_price": float(i.unit_price),
-                    "subtotal": float(i.subtotal),
-                }
-                for i in items
-            ],
-        })
-
-    return result
+    return [
+        {
+            "id": str(i.id),
+            "organization_id": str(i.organization_id),
+            "amount": float(i.amount),
+            "description": i.description,
+            "status": i.status,
+            "due_date": str(i.due_date) if i.due_date else None,
+            "created_at": i.created_at.isoformat() if i.created_at else None,
+        }
+        for i in invoices
+    ]
 
 
 # =========================================
 # CREATE INVOICE
 # =========================================
 
-@router.post("", response_model=InvoiceOut)
+@router.post("/", response_model=InvoiceOut)
 def create_invoice(
     data: InvoiceCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user)
+    current_user=Depends(get_current_user),
 ):
-    # validate organization
+
+    org_id = current_user.get("organization_id")
+
+    if not org_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user context"
+        )
+
     organization = db.query(Organization).filter(
-        Organization.id == data.organization_id
+        Organization.id == org_id
     ).first()
 
     if not organization:
-        raise HTTPException(status_code=404, detail="Organization not found")
+        raise HTTPException(
+            status_code=404,
+            detail="Organization not found"
+        )
 
     invoice = Invoice(
         id=uuid4(),
-        organization_id=data.organization_id,
+        organization_id=org_id,
         amount=data.amount,
         description=data.description,
         status="pending",
@@ -101,4 +91,12 @@ def create_invoice(
     db.commit()
     db.refresh(invoice)
 
-    return invoice
+    return {
+        "id": str(invoice.id),
+        "organization_id": str(invoice.organization_id),
+        "amount": float(invoice.amount),
+        "description": invoice.description,
+        "status": invoice.status,
+        "due_date": str(invoice.due_date) if invoice.due_date else None,
+        "created_at": invoice.created_at.isoformat() if invoice.created_at else None,
+    }
