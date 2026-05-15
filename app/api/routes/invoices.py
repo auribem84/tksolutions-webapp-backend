@@ -18,14 +18,20 @@ router = APIRouter(tags=["invoices"])
 # GET INVOICES (FRONTEND CONSUMES THIS)
 # =========================================
 
-@router.get("", response_model=List[InvoiceOut])
+@router.get("")
 def get_invoices(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user)
 ):
+    if not current_user:
+        raise HTTPException(status_code=401, detail="Not authenticated")
+
+    if not hasattr(current_user, "organization_id"):
+        raise HTTPException(status_code=400, detail="Missing organization_id")
+
     invoices = db.query(Invoice).filter(
         Invoice.organization_id == current_user.organization_id
-    ).order_by(Invoice.created_at.desc()).all()
+    ).all()
 
     return invoices
 
