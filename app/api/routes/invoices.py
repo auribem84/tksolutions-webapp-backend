@@ -59,8 +59,62 @@ def get_invoices(
 
 
 
+# =========================================
+# INVOICE STATS
+# =========================================
+
+@router.get("/stats")
+def get_invoice_stats(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    org_id = current_user.get("organization_id")
+
+    if not org_id:
+        raise HTTPException(
+            status_code=401,
+            detail="Invalid user context"
+        )
+
+    now = datetime.utcnow()
+
+    current_month_invoices = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        func.extract("month", Invoice.created_at) == now.month,
+        func.extract("year", Invoice.created_at) == now.year,
+    ).scalar()
+
+    outstanding = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        Invoice.status == "pending"
+    ).scalar()
+
+    paid = db.query(
+        func.coalesce(func.sum(Invoice.amount), 0)
+    ).filter(
+        Invoice.organization_id == org_id,
+        Invoice.status == "paid"
+    ).scalar()
+
+    total_invoices = db.query(Invoice).filter(
+        Invoice.organization_id == org_id
+    ).count()
+
+    return {
+        "current_month": float(current_month_invoices or 0),
+        "outstanding": float(outstanding or 0),
+        "paid": float(paid or 0),
+        "total_invoices": total_invoices,
+    }
 
 
+# =========================================
+# DOWNLOAD INVOICE PDF
+# =========================================
 @router.get("/{invoice_id}/pdf")
 def download_invoice_pdf(
     invoice_id: str,
