@@ -167,62 +167,75 @@
 
   <div class="section">
 
-    <div class="label">Invoice & Billing Information</div>
-
     <div class="two-col">
 
       <!-- LEFT: INVOICE DETAILS -->
-      <div class="info-box">
+      <div>
 
-        <div class="value">
-          <strong>Invoice Number:</strong>
-          #INV-{{ invoice.short_id }}
-        </div>
+        <div class="label">Invoice Details</div>
 
-        <div class="value">
-          <strong>Date of Issue:</strong>
-          {{ invoice.created_at }}
-        </div>
+        <div class="info-box">
 
-        <div class="value">
-          <strong>Due Date:</strong>
-          {{ invoice.due_date }}
-        </div>
+          <div class="value">
+            <strong>Invoice Number:</strong>
+            #INV-{{ invoice.short_id }}
+          </div>
 
-        <div class="value">
-          <strong>Payment Terms:</strong>
-          Net 15
-        </div>
+          <div class="value">
+            <strong>Date of Issue:</strong>
+            {{ invoice.created_at }}
+          </div>
 
-        <div class="value">
-          <strong>Status:</strong>
-          {{ invoice.status }}
+          <div class="value">
+            <strong>Due Date:</strong>
+            {{ invoice.due_date }}
+          </div>
+
+          <div class="value">
+            <strong>Payment Terms:</strong>
+            Net 15
+          </div>
+
+          <div class="value">
+            <strong>Status:</strong>
+            {{ invoice.status }}
+          </div>
+
         </div>
 
       </div>
 
       <!-- RIGHT: BILL TO -->
-      <div class="info-box">
+      <div>
 
-        <div class="value">
-          <strong>Client / Company Name:</strong>
-          John Doe / Sunshine Distribution LLC
-        </div>
+        <div class="label">Bill To (Client)</div>
 
-        <div class="value">
-          <strong>Address:</strong>
-          500 Brickell Ave, Apt 10
-        </div>
+        <div class="info-box">
 
-        <div class="value">
-          <strong>City, State, Zip Code:</strong>
-          Miami, FL 33131
-        </div>
+          <div class="value">
+            <strong>Client / Company Name:</strong>
+            John Doe / Sunshine Distribution LLC
+          </div>
 
-        <div class="value">
-          <strong>Phone:</strong>
-          (305) 555-0122 |
-          <strong>Email:</strong> john.doe@email.com
+          <div class="value">
+            <strong>Address:</strong>
+            500 Brickell Ave, Apt 10
+          </div>
+
+          <div class="value">
+            <strong>City, State, Zip Code:</strong>
+            Miami, FL 33131
+          </div>
+
+          <!-- separated lines -->
+          <div class="value">
+            <strong>Phone:</strong> (305) 555-0122
+          </div>
+
+          <div class="value">
+            <strong>Email:</strong> john.doe@email.com
+          </div>
+
         </div>
 
       </div>
@@ -231,11 +244,13 @@
 
   </div>
 
+</div>
 
 
 
 
 
+<!-- 
   <!-- =========================================
      INVOICE DETAILS + BILL TO
 ========================================== -->
@@ -311,7 +326,7 @@
     </div>
 
   </div>
-
+ -->
 
   
 

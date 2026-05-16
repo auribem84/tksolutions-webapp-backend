@@ -17,7 +17,7 @@ templates = Environment(
 def serialize_invoice(invoice):
     return {
         "id": str(invoice.id),
-        "short_id": str(invoice.id).replace("-", "")[:8].lower(),
+        "short_id": str(invoice.id).replace("-", "")[:8].upper(),
 
         "amount": float(invoice.amount or 0),
         "description": invoice.description or "",
