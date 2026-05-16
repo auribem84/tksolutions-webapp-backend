@@ -150,7 +150,7 @@ def download_invoice_pdf(
         media_type="application/pdf",
         headers={
             "Content-Disposition":
-            f"attachment; filename=invoice-{invoice.id}.pdf"
+            f"attachment; filename=invoice-{invoice_data['short_id']}.pdf"
         }
     )
 
