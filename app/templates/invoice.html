@@ -169,12 +169,12 @@
 
     <div class="value">
       <strong>Invoice Number:</strong>
-      #INV-{{ invoice.id|string|replace("-", "")[:8]|upper }}
+      #INV-{{ invoice.short_id }}
     </div>
 
     <div class="value">
       <strong>Date of Issue:</strong>
-      {{ invoice.created_at.strftime('%B %d, %Y') if invoice.created_at else 'N/A' }}
+      {{ invoice.created_at }}
     </div>
 
     <div class="value">

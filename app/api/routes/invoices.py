@@ -19,7 +19,7 @@ from app.models.invoice import Invoice
 from app.models.invoice_details import InvoiceDetail
 from app.models.organization import Organization
 from app.schemas.invoice import InvoiceCreate, InvoiceOut
-from app.services.invoice_pdf import generate_invoice_pdf
+from app.services.invoice_pdf import generate_invoice_pdf, serialize_invoice
 
 router = APIRouter()
 
@@ -141,7 +141,9 @@ def download_invoice_pdf(
             detail="Invoice not found"
         )
 
-    pdf = generate_invoice_pdf(invoice)
+    invoice_data = serialize_invoice(invoice)
+
+    pdf = generate_invoice_pdf(invoice_data)
 
     return StreamingResponse(
         pdf,

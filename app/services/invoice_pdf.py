@@ -14,7 +14,20 @@ templates = Environment(
     )
 )
 
-def generate_invoice_pdf(invoice):
+def serialize_invoice(invoice):
+    return {
+        "id": str(invoice.id),
+        "short_id": str(invoice.id).replace("-", "")[:8].upper(),
+
+        "amount": float(invoice.amount or 0),
+        "description": invoice.description or "",
+        "status": invoice.status,
+
+        "due_date": invoice.due_date.strftime("%B %d, %Y") if invoice.due_date else "N/A",
+        "created_at": invoice.created_at.strftime("%B %d, %Y") if invoice.created_at else "N/A",
+    }
+
+def generate_invoice_pdf(invoice: dict):
 
     template = templates.get_template(
         "invoice.html"
