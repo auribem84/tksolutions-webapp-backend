@@ -122,8 +122,6 @@
         <strong>Teknowsolutions LLC</strong>
       </div>
 
-      <br />
-
       <div class="value">
         3332 Robert Trent Jones Dr, Unit 109
       </div>
@@ -143,7 +141,7 @@
 
       <div class="value">
         Website:
-        www.teknowsolutions.com.com
+        www.teknowsolutions.com
       </div>
 
       <div class="value">
@@ -156,6 +154,77 @@
   </div>
 
 
+
+  <!-- =========================================
+     INVOICE DETAILS + BILL TO
+========================================== -->
+
+<div class="section">
+
+  <div class="label">
+    Invoice Details
+  </div>
+
+  <div class="info-box">
+
+    <div class="value">
+      <strong>Invoice Number:</strong>
+      #INV-{{ invoice.id[:8]|upper }}
+    </div>
+
+    <div class="value">
+      <strong>Date of Issue:</strong>
+      {{ invoice.created_at.strftime('%B %d, %Y') if invoice.created_at else 'N/A' }}
+    </div>
+
+    <div class="value">
+      <strong>Due Date:</strong>
+      May 30, 2026
+    </div>
+
+    <div class="value">
+      <strong>Payment Terms:</strong>
+      Net 15
+    </div>
+
+  </div>
+
+</div>
+
+<div class="section">
+
+  <div class="label">
+    Bill To (Client)
+  </div>
+
+  <div class="info-box">
+
+    <div class="value">
+      <strong>Client / Company Name:</strong>
+      {{ organization.name if organization else 'Client Name' }}
+      <!-- John Doe / Sunshine Distribution LLC -->
+    </div>
+
+    <div class="value">
+      <strong>Address:</strong>
+      500 Brickell Ave, Apt 10
+    </div>
+
+    <div class="value">
+      <strong>City, State, Zip Code:</strong>
+      Miami, FL 33131
+    </div>
+
+    <div class="value">
+      <strong>Phone:</strong>
+      (305) 555-0122 |
+      <strong>Email:</strong>
+      john.doe@email.com
+    </div>
+
+  </div>
+
+</div>
 
 
   <div class="section">
@@ -231,16 +300,16 @@
 
       <div class="value">
         Bank Transfer (ACH):
-        Chase Bank |
-        Routing: 267084131 |
-        Account: 581950816
+        <strong>Chase Bank</strong> |
+        Routing: <strong>267084131</strong> |
+        Account: <strong>581950816</strong>
       </div>
 
       <br />
 
       <div class="value">
         Check payable to:
-        Teknowsolutions LLC
+        <strong>Teknowsolutions LLC</strong>
       </div>
 
     </div>
