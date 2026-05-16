@@ -14,12 +14,12 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 20px;
+      margin-bottom: 10px;
     }
 
     .logo {
-      width: 160px;
-      margin-top: -5px;
+      width: 150px;
+      margin-top: -10px;
     }
 
     .invoice-title {
@@ -94,6 +94,23 @@
       margin-bottom: 20px;
     }
 
+    .company-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    .payment-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 13px;
+      line-height: 1.4;
+    }
+
+    .payment-list li {
+      margin-bottom: 6px;
+    }
+
   </style>
 </head>
 
@@ -126,37 +143,46 @@
       Company Information
     </div>
 
-    <div class="info-box">
+    <div class="info-box company-grid">
 
-      <div class="value">
-        <strong>Teknowsolutions LLC</strong>
+      <!-- LEFT -->
+      <div>
+
+        <div class="value">
+          <strong>Teknowsolutions LLC</strong>
+        </div>
+
+        <div class="value">
+          3332 Robert Trent Jones Dr, Unit 109
+        </div>
+
+        <div class="value">
+          Orlando, Florida | 32835
+        </div>
+
+        <div class="value">
+          FLORIDA TAX ID / EIN: XX-XXXXXXX
+        </div>
+
       </div>
 
-      <div class="value">
-        3332 Robert Trent Jones Dr, Unit 109
-      </div>
+      <!-- RIGHT -->
+      <div>
 
-      <div class="value">
-        Orlando, Florida | 32835
-      </div>
+        <div class="value">
+          Phone: (305) 555-0199
+        </div>
 
-      <br />
+        <div class="value">
+          Email: auribe@teknowsolutions.com
+        </div>
 
-      <div class="value">
-        Phone:
-        (305) 555-0199 |
-        Email:
-        auribe@teknowsolutions.com
-      </div>
+        <div class="value">
+          Website: www.teknowsolutions.com
+        </div>
 
-      <div class="value">
-        Website:
-        www.teknowsolutions.com
-      </div>
 
-      <div class="value">
-        FLORIDA TAX ID / EIN:
-        XX-XXXXXXX
+
       </div>
 
     </div>
@@ -213,8 +239,7 @@
         <div class="info-box">
 
           <div class="value">
-            <strong>Client:</strong>
-            Sunshine Distribution LLC
+            <strong>PJ Autosales LLC</strong>
           </div>
 
           <div class="value">
@@ -224,7 +249,7 @@
           <div class="value">
             Miami, FL 33131
           </div>
-          
+
           <div class="value">
             <strong>Phone:</strong> (305) 555-0122
           </div>
@@ -242,13 +267,6 @@
   </div>
 
 </div>
-
-  <div class="section">
-
-    <div class="label">Description</div>
-    <div class="value">
-      {{ invoice.description }}
-    </div>
 
   </div>
 
@@ -293,19 +311,19 @@
 
     <div class="info-box">
 
-      <div class="value">
-        Bank Transfer (ACH):
-        <strong>Chase Bank</strong> |
-        Routing: <strong>267084131</strong> |
-        Account: <strong>581950816</strong>
-      </div>
+      <ul class="payment-list">
 
-      <br />
+        <li>
+          <strong>Bank Transfer (ACH):</strong>
+          Chase Bank | Routing: 267084131 | Account: 581950816
+        </li>
 
-      <div class="value">
-        Check payable to:
-        <strong>Teknowsolutions LLC</strong>
-      </div>
+        <li>
+          <strong>Check:</strong>
+          Payable to Teknowsolutions LLC
+        </li>
+
+      </ul>
 
     </div>
 
