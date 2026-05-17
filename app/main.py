@@ -15,7 +15,9 @@ from app.api.routes import (
 from app.api.routes.admin import (
     invitations,
     bootstrap,
-    projects as admin_projects
+    projects as admin_projects,
+    organizations as admin_organizations,
+    users as admin_users
 )
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
@@ -58,6 +60,8 @@ app.include_router(organizations.router, prefix="/organizations", tags=["Organiz
 # ADMIN
 app.include_router(invitations.router, prefix="/admin/invitations", tags=["Admin"])
 app.include_router(admin_projects.router, prefix="/admin/projects", tags=["Admin"])
+app.include_router(admin_organizations.router, prefix="/admin/organizations",tags=["Admin"])
+app.include_router(admin_users.router,prefix="/admin/users",tags=["Admin"])
 app.include_router(bootstrap.router, prefix="/admin", tags=["Admin"])
 
 # 🚀 STARTUP
