@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px 30px 20px 30px;
+      color: #111;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+
+    .logo {
+      width: 150px;
+      margin-top: -10px;
+    }
+
+    .invoice-title {
+      font-size: 32px;
+      font-weight: bold;
+      margin-top: 5px;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .label {
+      color: #666;
+      font-size: 13px;
+      text-transform: uppercase;
+    }
+
+    .value {
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 20px;
+    }
+
+    th {
+      background: #f4f4f4;
+      text-align: left;
+      padding: 12px;
+      font-size: 13px;
+    }
+
+    td {
+      padding: 12px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .total-box {
+      margin-top: 30px;
+      width: 300px;
+      margin-left: auto;
+    }
+
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+    }
+
+    .grand-total {
+      font-size: 18px;
+      font-weight: bold;
+      border-top: 2px solid #111;
+      padding-top: 10px;
+    }
+
+    .footer {
+      margin-top: 80px;
+      font-size: 10px;
+      color: #888;
+      text-align: center;
+    }
+
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 20px;
+    }
+
+    .payment-list {
+      margin: 0;
+      padding-left: 18px;
+      font-size: 10px;
+      line-height: 1.4;
+    }
+
+    .payment-list li {
+      margin-bottom: 6px;
+    }
+
+  </style>
+</head>
+
+<body>
+
+  <div class="header">
+
+    <div>
+      <img
+        src="{{ logo_path }}"
+        class="logo"
+      />
+    </div>
+
+    <div class="invoice-title">
+      INVOICE
+    </div>
+
+  </div>
+
+
+
+  <!-- =========================================
+     COMPANY INFO
+========================================== -->
+
+  <div class="section">
+
+    <div class="label">
+      Company Information
+    </div>
+
+    <div class="info-box">
+
+      <div class="value">
+        <strong>Teknowsolutions LLC</strong>
+      </div>
+
+      <div class="value">
+        3332 Robert Trent Jones Dr, Unit 109, Orlando, FL 32835
+      </div>
+
+      <div class="value">
+        <strong>Phone:</strong> (305) 555-0199 | <strong>Email:</strong> auribe@teknowsolutions.com
+      </div>
+
+      <div class="value">
+        FLORIDA TAX ID / EIN: 99-0970263
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <div class="section">
+
+    <div class="two-col">
+
+      <!-- LEFT: INVOICE DETAILS -->
+      <div>
+
+        <div class="label">Invoice Details</div>
+
+        <div class="info-box">
+
+          <div class="value">
+            <strong>Invoice No.:</strong>
+            #INV-{{ invoice.short_id }}
+          </div>
+
+          <div class="value">
+            <strong>Issued Date:</strong>
+            {{ invoice.created_at }}
+          </div>
+
+          <div class="value">
+            <strong>Due Date:</strong>
+            {{ invoice.due_date }}
+          </div>
+
+          <div class="value">
+            <strong>Payment Terms:</strong>
+            Net 15
+          </div>
+
+          <div class="value">
+            <strong>Status:</strong>
+            {{ invoice.status }}
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- RIGHT: BILL TO -->
+      <div>
+
+        <div class="label">Bill To (Client)</div>
+
+        <div class="info-box">
+
+          <div class="value">
+            <strong>PJ Autosales LLC</strong>
+          </div>
+
+          <div class="value">
+            4802 Distribution CT, Ste 2
+          </div>
+
+          <div class="value">
+            Orlando, FL 32822
+          </div>
+
+          <div class="value">
+            <strong>Phone:</strong> (954) 200-2136
+          </div>
+
+          <div class="value">
+            <strong>Email:</strong> pjautosalesfl@hotmail.com
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+  </div>
+
+  <table>
+
+    <thead>
+      <tr>
+        <th>Description</th>
+        <th>Amount</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr>
+        <td>{{ invoice.description }}</td>
+        <td>${{ "%.2f"|format(invoice.amount) }}</td>
+      </tr>
+    </tbody>
+
+  </table>
+
+  <div class="total-box">
+
+    <div class="total-row grand-total">
+      <span>Total</span>
+      <span>${{ "%.2f"|format(invoice.amount) }}</span>
+    </div>
+
+  </div>
+
+  <br />
+
+
+<!-- =========================================
+       PAYMENT METHODS
+  ========================================== -->
+
+  <div class="section">
+
+    <div class="label">
+      Accepted Payment Methods
+    </div>
+
+    <div class="info-box">
+
+      <ul class="payment-list">
+
+        <li>
+          <strong>Bank Transfer (ACH):</strong>
+          Chase Bank | Routing: 267084131 | Account: 581950816
+        </li>
+
+        <li>
+          <strong>Check:</strong>
+          Payable to Teknowsolutions LLC
+        </li>
+
+      </ul>
+
+    </div>
+
+  </div>
+
+  <!-- =========================================
+       NOTES
+  ========================================== -->
+
+  <div class="section">
+
+    <div class="label">
+      Notes / Terms
+    </div>
+
+    <div class="info-box">
+
+      <div class="value">
+        * Professional consulting services are generally not subject
+        to sales tax in Florida.
+      </div>
+
+      <br />  
+      <br />
+
+      <div class="value">
+        Thank you for your business!
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- =========================================
+       FOOTER
+  ========================================== -->
+  <div class="footer">
+    Generated by Teknowsolutions LLC
+  </div>
+
+</body>
+</html>

@@ -14,6 +14,9 @@ from app.schemas.organization import (
     OrganizationBootstrapCreate,
 )
 
+from app.models.organization_profile import OrganizationProfile
+from app.models.organization_contact import OrganizationContact
+
 from app.core.security import hash_password
 
 router = APIRouter()
@@ -51,56 +54,3 @@ def list_orgs(
     return db.query(Organization).all()
 
 
-# =========================
-# BOOTSTRAP ORGANIZATION + FIRST ADMIN
-# =========================
-@router.post("/bootstrap")
-def create_organization_with_admin(
-    data: OrganizationBootstrapCreate,
-    db: Session = Depends(get_db),
-    current_user=Depends(require_default_admin),
-):
-    # 1. Create organization
-    org = Organization(
-        id=uuid.uuid4(),
-        name=data.org_name,
-    )
-    db.add(org)
-    db.flush()
-
-    # 2. Create user (admin of new org)
-    user = User(
-        id=uuid.uuid4(),
-        email=data.admin_email,
-        hashed_password=hash_password(data.admin_password),
-        is_active=True,
-    )
-    db.add(user)
-    db.flush()
-
-    # 3. Ensure admin role exists
-    admin_role = db.query(Role).filter(Role.name == "admin").first()
-
-    if not admin_role:
-        admin_role = Role(
-            id=uuid.uuid4(),
-            name="admin"
-        )
-        db.add(admin_role)
-        db.flush()
-
-    # 4. Link user to organization
-    link = OrganizationUser(
-        user_id=user.id,
-        organization_id=org.id,
-        role_id=admin_role.id,
-    )
-
-    db.add(link)
-    db.commit()
-
-    return {
-        "organization_id": org.id,
-        "user_id": user.id,
-        "message": "Organization bootstrap successful"
-    }

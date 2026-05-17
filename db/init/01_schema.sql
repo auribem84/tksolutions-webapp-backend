@@ -61,9 +61,22 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 
     CREATE TABLE organization_profiles (
         id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-        organization_id UUID UNIQUE REFERENCES organizations(id) ON DELETE CASCADE,
+
+        organization_id UUID UNIQUE
+            REFERENCES organizations(id)
+            ON DELETE CASCADE,
 
         itin VARCHAR(50),
+
+        address1 VARCHAR(255),
+        address2 VARCHAR(255),
+
+        city VARCHAR(100),
+        state VARCHAR(100),
+        zip VARCHAR(20),
+
+        phone VARCHAR(50),
+        email VARCHAR(255),
 
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP
