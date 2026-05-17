@@ -228,6 +228,57 @@ def create_organization_with_admin(
     }
 
 
+@router.post("/full")
+def create_organization_full(
+    data: OrganizationCreateFull,
+    db: Session = Depends(get_db),
+    current_user=Depends(require_default_admin),
+):
+    # 1. Organization
+    org = Organization(
+        id=uuid.uuid4(),
+        name=data.org_name,
+    )
+    db.add(org)
+    db.flush()
+
+    # 2. Profile
+    profile = OrganizationProfile(
+        organization_id=org.id,
+        itin=data.itin,
+        address1=data.address1,
+        address2=data.address2,
+        city=data.city,
+        state=data.state,
+        zip=data.zip,
+        phone=data.phone,
+        email=data.email,
+    )
+    db.add(profile)
+
+    # 3. Contacts
+    for idx, c in enumerate(data.contacts):
+        contact = OrganizationContact(
+            id=uuid.uuid4(),
+            organization_id=org.id,
+            contact_name=c.contact_name,
+            contact_lastname=c.contact_lastname,
+            contact_title=c.contact_title,
+            contact_email=c.contact_email,
+            contact_phone=c.contact_phone,
+            contact_mobile=c.contact_mobile,
+            is_primary=(idx == 0),  # 👈 primer contacto como primary
+        )
+        db.add(contact)
+
+    db.commit()
+
+    return {
+        "organization_id": org.id,
+        "message": "Organization created successfully with profile and contacts"
+    }
+
+
 @router.get("/{org_id}")
 def get_organization(org_id: UUID, db: Session = Depends(get_db), user=Depends(require_default_admin)):
     org = db.query(Organization).filter(Organization.id == org_id).first()

@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
@@ -42,7 +42,7 @@ class OrganizationCreateFull(BaseModel):
     phone: Optional[str] = None
     email: Optional[str] = None
 
-    contacts: list[OrganizationContactCreate] = []
+    contacts: list[OrganizationContactCreate] = Field(default_factory=list)
 
 
 class OrganizationBootstrapCreate(BaseModel):
@@ -80,7 +80,7 @@ class OrganizationBootstrapCreate(BaseModel):
     # CONTACTS
     # =========================================
 
-    contacts: list[OrganizationContactCreate] = []
+    contacts: list[OrganizationContactCreate] = Field(default_factory=list)
 
 class OrganizationProfileOut(BaseModel):
     itin: Optional[str] = None

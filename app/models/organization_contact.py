@@ -20,7 +20,7 @@ class OrganizationContact(Base):
     contact_phone = Column(String(50))
     contact_mobile = Column(String(50))
 
-    is_primary = Column(Boolean, default=True)
+    is_primary = Column(Boolean, default=False)
 
     created_at = Column(DateTime, default=datetime.utcnow)
     updated_at = Column(DateTime, nullable=True)
