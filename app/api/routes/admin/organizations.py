@@ -13,6 +13,8 @@ from app.schemas.organization import (
     OrganizationOut,
 )
 
+import uuid
+
 router = APIRouter()
 
 
