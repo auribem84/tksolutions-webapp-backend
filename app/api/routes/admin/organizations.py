@@ -7,6 +7,12 @@ from uuid import UUID
 from app.api.deps import get_db, require_default_admin
 from app.models.organization import Organization
 
+from app.schemas.organization import (
+    OrganizationCreateFull,
+    OrganizationBootstrapCreate,
+    OrganizationOut,
+)
+
 router = APIRouter()
 
 

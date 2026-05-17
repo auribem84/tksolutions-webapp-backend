@@ -43,4 +43,4 @@ class UserResponse(UserBase):
     full_name: str
 
     class Config:
-        orm_mode = True
+        from_atributes = True
