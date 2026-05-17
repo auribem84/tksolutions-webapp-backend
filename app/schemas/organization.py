@@ -16,6 +16,16 @@ class OrganizationOut(BaseModel):
     class Config:
         from_attributes = True
 
+class OrganizationContactCreate(BaseModel):
+    contact_name: str
+    contact_lastname: Optional[str] = None
+    contact_title: Optional[str] = None
+
+    contact_email: Optional[str] = None
+    contact_phone: Optional[str] = None
+    contact_mobile: Optional[str] = None
+
+
 class OrganizationCreateFull(BaseModel):
 
     org_name: str
@@ -33,15 +43,6 @@ class OrganizationCreateFull(BaseModel):
     email: Optional[str] = None
 
     contacts: list[OrganizationContactCreate] = []
-
-class OrganizationContactCreate(BaseModel):
-    contact_name: str
-    contact_lastname: Optional[str] = None
-    contact_title: Optional[str] = None
-
-    contact_email: Optional[str] = None
-    contact_phone: Optional[str] = None
-    contact_mobile: Optional[str] = None
 
 
 class OrganizationBootstrapCreate(BaseModel):
