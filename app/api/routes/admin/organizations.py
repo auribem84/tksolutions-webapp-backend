@@ -279,7 +279,7 @@ def create_organization_full(
     }
 
 
-@router.get("/{org_id}")
+@router.get("/{org_id:uuid}")
 def get_organization(org_id: UUID, db: Session = Depends(get_db), user=Depends(require_default_admin)):
     org = db.query(Organization).filter(Organization.id == org_id).first()
     if not org:
