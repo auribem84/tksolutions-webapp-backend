@@ -143,7 +143,7 @@ def download_invoice_pdf(
 
     invoice_data = serialize_invoice(invoice)
 
-    pdf = generate_invoice_pdf(invoice_data)
+    pdf = generate_invoice_pdf(invoice_data, db)
 
     return StreamingResponse(
         pdf,

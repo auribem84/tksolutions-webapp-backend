@@ -208,23 +208,35 @@
         <div class="info-box">
 
           <div class="value">
-            <strong>PJ Autosales LLC</strong>
+            <strong>
+              {{ invoice.organization.name }}
+            </strong>
           </div>
 
           <div class="value">
-            4802 Distribution CT, Ste 2
+            {{ invoice.organization_profile.address1 }}
+          </div>
+
+          {% if invoice.organization_profile.address2 %}
+          <div class="value">
+            {{ invoice.organization_profile.address2 }}
+          </div>
+          {% endif %}
+
+          <div class="value">
+            {{ invoice.organization_profile.city }},
+            {{ invoice.organization_profile.state }}
+            {{ invoice.organization_profile.zip }}
           </div>
 
           <div class="value">
-            Orlando, FL 32822
+            <strong>Phone:</strong>
+            {{ invoice.organization_profile.phone }}
           </div>
 
           <div class="value">
-            <strong>Phone:</strong> (954) 200-2136
-          </div>
-
-          <div class="value">
-            <strong>Email:</strong> pjautosalesfl@hotmail.com
+            <strong>Email:</strong>
+            {{ invoice.organization_profile.email }}
           </div>
 
         </div>
