@@ -6,8 +6,32 @@ from app.models.invoice import Invoice
 from app.models.project import Project
 from app.models.ticket import Ticket
 from app.models.organization import Organization
+from app.models.user import User
+from app.models.service import Service
 
 router = APIRouter()
+
+@router.get("/{org_id}/users")
+def users(
+    org_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin)
+):
+    return db.query(User).filter(
+        User.organization_id == org_id
+    ).all()
+
+
+@router.get("/{org_id}/services")
+def services(
+    org_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin)
+):
+    return db.query(Service).filter(
+        Service.organization_id == org_id
+    ).all()
+
 
 @router.get("/{org_id}/invoices")
 def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
