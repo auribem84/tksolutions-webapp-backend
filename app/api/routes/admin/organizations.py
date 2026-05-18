@@ -291,25 +291,87 @@ def get_organization(org_id: UUID, db: Session = Depends(get_db), user=Depends(r
     return org
 
 
-@router.put("/{org_id}")
-def update_organization(org_id: UUID, data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
-    org = db.query(Organization).filter(Organization.id == org_id).first()
+# =========================================
+# UPDATE ORGANIZATION
+# =========================================
 
-    if not org:
-        raise HTTPException(404, "Not found")
+@router.put("/{organization_id}")
+def update_organization(
+    organization_id: str,
+    data: OrganizationCreateFull,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
 
-    org.name = data.get("name", org.name)
+    organization = db.query(Organization).filter(
+        Organization.id == organization_id
+    ).first()
+
+    if not organization:
+        raise HTTPException(
+            status_code=404,
+            detail="Organization not found"
+        )
+
+    organization.name = data.org_name
+
+    profile = db.query(OrganizationProfile).filter(
+        OrganizationProfile.organization_id == organization_id
+    ).first()
+
+    if profile:
+        profile.itin = data.itin
+        profile.address1 = data.address1
+        profile.address2 = data.address2
+        profile.city = data.city
+        profile.state = data.state
+        profile.zip = data.zip
+        profile.phone = data.phone
+        profile.email = data.email
+
     db.commit()
-    return {"message": "updated"}
+
+    return {
+        "success": True
+    }
 
 
-@router.delete("/{org_id}")
-def deactivate_organization(org_id: UUID, db: Session = Depends(get_db), user=Depends(require_default_admin)):
-    org = db.query(Organization).filter(Organization.id == org_id).first()
+# =========================================
+# DELETE ORGANIZATION
+# =========================================
 
-    if not org:
-        raise HTTPException(404, "Not found")
+@router.delete("/{organization_id}")
+def delete_organization(
+    organization_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
 
-    org.is_active = False
+    organization = db.query(Organization).filter(
+        Organization.id == organization_id
+    ).first()
+
+    if not organization:
+        raise HTTPException(
+            status_code=404,
+            detail="Organization not found"
+        )
+
+    # DELETE CONTACTS
+    db.query(OrganizationContact).filter(
+        OrganizationContact.organization_id == organization_id
+    ).delete()
+
+    # DELETE PROFILE
+    db.query(OrganizationProfile).filter(
+        OrganizationProfile.organization_id == organization_id
+    ).delete()
+
+    # DELETE ORGANIZATION
+    db.delete(organization)
+
     db.commit()
-    return {"message": "deactivated"}
+
+    return {
+        "success": True
+    }
