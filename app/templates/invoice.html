@@ -214,14 +214,8 @@
           </div>
 
           <div class="value">
-            {{ invoice.organization_profile.address1 or '' }}
+            {{ invoice.organization_profile.full_address }}
           </div>
-
-          {% if invoice.organization_profile.address2 %}
-          <div class="value">
-            {{ invoice.organization_profile.address2 }}
-          </div>
-          {% endif %}
 
           <div class="value">
             {{ invoice.organization_profile.city }},

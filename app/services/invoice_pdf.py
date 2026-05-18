@@ -25,6 +25,15 @@ def serialize_invoice(invoice, db):
         OrganizationProfile.organization_id == org.id
     ).first()
 
+    address1 = profile.address1 if profile else ""
+    address2 = profile.address2 if profile else ""
+
+    full_address = (
+        f"{address1}, {address2}"
+        if address2
+        else address1
+    )
+
     return {
         "id": str(invoice.id),
         "short_id": str(invoice.id).replace("-", "")[-6:].upper(),
@@ -34,8 +43,9 @@ def serialize_invoice(invoice, db):
         },
 
         "organization_profile": {
-            "address1": profile.address1 if profile else "",
-            "address2": profile.address2 if profile else "",
+            "address1": address1,
+            "address2": address2,
+            "full_address": full_address,
             "city": profile.city if profile else "",
             "state": profile.state if profile else "",
             "zip": profile.zip if profile else "",
