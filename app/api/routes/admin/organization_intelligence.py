@@ -8,6 +8,7 @@ from app.models.ticket import Ticket
 from app.models.organization import Organization
 from app.models.user import User
 from app.models.service import Service
+from app.models.organization_user import OrganizationUser
 
 router = APIRouter()
 
@@ -18,20 +19,22 @@ def users(
     user=Depends(require_default_admin)
 ):
 
-    users = db.query(User).filter(
-        User.organization_id == org_id
-    ).all()
+    users = (
+        db.query(User)
+        .join(
+            OrganizationUser,
+            OrganizationUser.user_id == User.id
+        )
+        .filter(
+            OrganizationUser.organization_id == org_id
+        )
+        .all()
+    )
 
     return [
         {
             "id": str(u.id),
             "email": u.email,
-            "full_name": u.full_name,
-            "role": u.role,
-            "created_at":
-                u.created_at.isoformat()
-                if u.created_at
-                else None,
         }
         for u in users
     ]
