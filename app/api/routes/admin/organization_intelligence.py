@@ -11,7 +11,21 @@ router = APIRouter()
 
 @router.get("/{org_id}/invoices")
 def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
-    return db.query(Invoice).filter(Invoice.organization_id == org_id).all()
+
+    invoices = db.query(Invoice).filter(
+        Invoice.organization_id == org_id
+    ).all()
+
+    return [
+        {
+            "id": str(i.id),
+            "amount": float(i.amount),
+            "description": i.description,
+            "status": i.status,
+            "created_at": i.created_at.isoformat() if i.created_at else None,
+        }
+        for i in invoices
+    ]
 
 
 @router.get("/{org_id}/projects")
