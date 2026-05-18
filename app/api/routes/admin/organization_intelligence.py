@@ -17,9 +17,24 @@ def users(
     db: Session = Depends(get_db),
     user=Depends(require_default_admin)
 ):
-    return db.query(User).filter(
+
+    users = db.query(User).filter(
         User.organization_id == org_id
     ).all()
+
+    return [
+        {
+            "id": str(u.id),
+            "email": u.email,
+            "full_name": u.full_name,
+            "role": u.role,
+            "created_at":
+                u.created_at.isoformat()
+                if u.created_at
+                else None,
+        }
+        for u in users
+    ]
 
 
 @router.get("/{org_id}/services")
@@ -28,9 +43,19 @@ def services(
     db: Session = Depends(get_db),
     user=Depends(require_default_admin)
 ):
-    return db.query(Service).filter(
+
+    services = db.query(Service).filter(
         Service.organization_id == org_id
     ).all()
+
+    return [
+        {
+            "id": str(s.id),
+            "name": s.name,
+            "status": s.status,
+        }
+        for s in services
+    ]
 
 
 @router.get("/{org_id}/invoices")
