@@ -141,9 +141,9 @@ def download_invoice_pdf(
             detail="Invoice not found"
         )
 
-    invoice_data = serialize_invoice(invoice)
+    invoice_data = serialize_invoice(invoice, db)
 
-    pdf = generate_invoice_pdf(invoice_data, db)
+    pdf = generate_invoice_pdf(invoice_data)
 
     return StreamingResponse(
         pdf,
