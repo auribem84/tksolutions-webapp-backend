@@ -1,5 +1,6 @@
 from sqlalchemy import Column, String, ForeignKey, Float, DateTime, Text, Numeric
 from sqlalchemy.dialects.postgresql import UUID
+from sqlalchemy.orm import relationship
 import uuid
 from datetime import datetime
 
@@ -20,3 +21,5 @@ class Invoice(Base):
     due_date = Column(DateTime, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
+
+    organization = relationship("Organization")
