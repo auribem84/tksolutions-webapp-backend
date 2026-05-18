@@ -208,15 +208,15 @@
         <div class="info-box">
 
           <div class="value">
-            <strong>PJ Autosales LLC</strong>
+            <strong>{organization.name}</strong>
           </div>
 
           <div class="value">
-            4802 Distribution CT, Ste 2
+            {organization.profile?.address1}
           </div>
 
           <div class="value">
-            Orlando, FL 32822
+            {organization.profile?.city}, {organization.profile?.state} {organization.profile?.zip}
           </div>
 
           <div class="value">
