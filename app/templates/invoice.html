@@ -214,7 +214,7 @@
           </div>
 
           <div class="value">
-            {{ invoice.organization_profile.address1 }}
+            {{ invoice.organization_profile.address1 or '' }}
           </div>
 
           {% if invoice.organization_profile.address2 %}
@@ -263,7 +263,7 @@
     <tbody>
       <tr>
         <td>{{ invoice.description }}</td>
-        <td>${{ "%.2f"|format(invoice["amount"]) }}</td>
+        <td>${{ "%.2f"|format(invoice.amount) }}</td>
       </tr>
     </tbody>
 
@@ -273,7 +273,7 @@
 
     <div class="total-row grand-total">
       <span>Total</span>
-      <span>${{ "%.2f"|format(invoice["amount"]) }}</span>
+      <span>${{ "%.2f"|format(invoice.amount) }}</span>
     </div>
 
   </div>

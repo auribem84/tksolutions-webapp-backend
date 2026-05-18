@@ -26,7 +26,6 @@ def serialize_invoice(invoice, db):
     ).first()
 
     return {
-
         "id": str(invoice.id),
         "short_id": str(invoice.id)[:8],
 
@@ -35,34 +34,21 @@ def serialize_invoice(invoice, db):
         },
 
         "organization_profile": {
-
-            "address1":
-                profile.address1 if profile else "",
-
-            "address2":
-                profile.address2 if profile else "",
-
-            "city":
-                profile.city if profile else "",
-
-            "state":
-                profile.state if profile else "",
-
-            "zip":
-                profile.zip if profile else "",
-
-            "phone":
-                profile.phone if profile else "",
-
-            "email":
-                profile.email if profile else "",
+            "address1": profile.address1 if profile else "",
+            "address2": profile.address2 if profile else "",
+            "city": profile.city if profile else "",
+            "state": profile.state if profile else "",
+            "zip": profile.zip if profile else "",
+            "phone": profile.phone if profile else "",
+            "email": profile.email if profile else "",
         },
 
-        "invoice": {
-            "amount": float(invoice.amount),
-            "description": invoice.description,
-            "status": invoice.status,
-        }
+        # ✅ FLATTEN invoice fields (IMPORTANT)
+        "description": invoice.description,
+        "amount": float(invoice.amount),
+        "status": invoice.status,
+        "due_date": invoice.due_date.isoformat() if invoice.due_date else None,
+        "created_at": invoice.created_at.isoformat() if invoice.created_at else None,
     }
 
 
