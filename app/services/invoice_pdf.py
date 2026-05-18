@@ -14,12 +14,8 @@ templates = Environment(
     )
 )
 
-def serialize_invoice(invoice, db):
+def serialize_invoice(invoice):
     org = invoice.organization
-
-    profile = db.query(OrganizationProfile).filter(
-        OrganizationProfile.organization_id == org.id
-    ).first()
 
     return {
         "id": str(invoice.id),
