@@ -15,25 +15,16 @@ templates = Environment(
 )
 
 def serialize_invoice(invoice):
-    org = invoice.organization
-
     return {
         "id": str(invoice.id),
-        "short_id": str(invoice.id)[:8],
+        "short_id": str(invoice.id).replace("-", "")[-6:].upper(),
 
-        "organization": {
-            "name": org.name,
-        },
+        "amount": float(invoice.amount or 0),
+        "description": invoice.description or "",
+        "status": invoice.status,
 
-        "organization_profile": {
-            "address1": profile.address1 if profile else "",
-            "address2": profile.address2 if profile else "",
-            "city": profile.city if profile else "",
-            "state": profile.state if profile else "",
-            "zip": profile.zip if profile else "",
-            "phone": profile.phone if profile else "",
-            "email": profile.email if profile else "",
-        }
+        "due_date": invoice.due_date.strftime("%B %d, %Y") if invoice.due_date else "N/A",
+        "created_at": invoice.created_at.strftime("%B %d, %Y") if invoice.created_at else "N/A",
     }
 
 def generate_invoice_pdf(invoice: dict):

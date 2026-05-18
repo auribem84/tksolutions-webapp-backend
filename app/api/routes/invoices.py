@@ -18,7 +18,6 @@ from app.api.deps import get_db, get_current_user
 from app.models.invoice import Invoice
 from app.models.invoice_details import InvoiceDetail
 from app.models.organization import Organization
-from app.models.organization_profile import OrganizationProfile
 from app.schemas.invoice import InvoiceCreate, InvoiceOut
 from app.services.invoice_pdf import generate_invoice_pdf, serialize_invoice
 
