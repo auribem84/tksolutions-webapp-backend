@@ -27,7 +27,7 @@ def serialize_invoice(invoice, db):
 
     return {
         "id": str(invoice.id),
-        "short_id": str(invoice.id)[:8],
+        "short_id": str(invoice.id).replace("-", "")[-6:].upper(),
 
         "organization": {
             "name": org.name,
@@ -46,9 +46,17 @@ def serialize_invoice(invoice, db):
         # ✅ FLATTEN invoice fields (IMPORTANT)
         "description": invoice.description,
         "amount": float(invoice.amount),
-        "status": invoice.status,
-        "due_date": invoice.due_date.isoformat() if invoice.due_date else None,
-        "created_at": invoice.created_at.isoformat() if invoice.created_at else None,
+        "status": invoice.status.capitalize() if invoice.status else "",
+        "due_date": (
+            invoice.due_date.strftime("%Y-%m-%d")
+            if invoice.due_date
+            else None
+        ),
+        "created_at": (
+            invoice.created_at.strftime("%Y-%m-%d")
+            if invoice.created_at
+            else None
+        ),
     }
 
 
