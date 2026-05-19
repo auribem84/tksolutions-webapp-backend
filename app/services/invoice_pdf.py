@@ -58,12 +58,12 @@ def serialize_invoice(invoice, db):
         "amount": float(invoice.amount),
         "status": invoice.status.capitalize() if invoice.status else "",
         "due_date": (
-            invoice.due_date.strftime("%Y-%m-%d")
+            invoice.due_date.strftime("%B %d, %Y")
             if invoice.due_date
             else None
         ),
         "created_at": (
-            invoice.created_at.strftime("%Y-%m-%d")
+            invoice.created_at.strftime("%B %d, %Y")
             if invoice.created_at
             else None
         ),
