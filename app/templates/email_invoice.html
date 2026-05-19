@@ -1,8 +1,11 @@
 <p>Dear {{ organization_name }},</p>
 
+<p>I hope this email finds you well.</p>
+
 <p>
 Please find attached invoice
-<strong>INV-{{ short_id }}</strong>.
+<strong>INV-{{ short_id }}</strong>
+for the service(s) provided.
 </p>
 
 <p>
@@ -11,20 +14,32 @@ Please find attached invoice
 
 <ul>
   <li>
-    Amount Due:
-    ${{ amount }}
+    <strong>Invoice Number:</strong>
+    INV-{{ short_id }}
   </li>
 
   <li>
-    Due Date:
+    <strong>Due Date:</strong>
     {{ due_date }}
+  </li>
+
+  <li>
+    <strong>Amount Due:</strong>
+    ${{ amount }} USD
   </li>
 </ul>
 
 <p>
-Thank you for your business.
+<strong>Payment Terms:</strong><br>
+Please process the payment by the due date via bank transfer or check provided in the invoice.
+If you have any questions or require modifications, feel free to reply directly to <strong>auribe@teknowsolutions.com.</strong>
 </p>
 
 <p>
-Teknow Solutions
+Thank you for your business!
+</p>
+
+<p>
+Best regards,<br>
+Teknowsolutions LLC
 </p>
