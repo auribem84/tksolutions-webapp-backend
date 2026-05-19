@@ -107,3 +107,17 @@ def generate_invoice_pdf(invoice: dict):
     pdf_buffer.seek(0)
 
     return pdf_buffer
+
+
+def render_invoice_email(invoice: dict):
+
+    template = templates.get_template(
+        "email_invoice.html"
+    )
+
+    return template.render(
+        organization_name=invoice["organization"]["name"],
+        short_id=invoice["short_id"],
+        amount=invoice["amount"],
+        due_date=invoice["due_date"],
+    )

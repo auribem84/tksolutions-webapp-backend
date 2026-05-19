@@ -17,6 +17,7 @@ from app.api.routes.admin import (
     bootstrap,
     organization_intelligence,
     organization_users,
+    tools,
     projects as admin_projects,
     organizations as admin_organizations,
     users as admin_users
@@ -74,6 +75,11 @@ app.include_router(
     organization_users.router,
     prefix="/admin/organizations",
     tags=["Admin"]
+)
+app.include_router(
+    tools.router,
+    prefix="/admin/tools",
+    tags=["Admin Tools"]
 )
 
 # 🚀 STARTUP

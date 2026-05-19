@@ -1,5 +1,9 @@
 # app/services/email_service.py
 
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.application import MIMEApplication
+
 import boto3
 import os
 
@@ -36,5 +40,42 @@ def send_invitation_email(to_email: str, invite_link: str):
                     """
                 }
             }
+        }
+    )
+
+def send_invoice_email(
+    recipient_email: str,
+    subject: str,
+    body_html: str,
+    pdf_bytes: bytes,
+    filename: str,
+):
+
+    message = MIMEMultipart()
+
+    message["Subject"] = subject
+    message["From"] = os.getenv("SES_FROM_EMAIL")
+    message["To"] = recipient_email
+
+    # EMAIL BODY
+    body_part = MIMEText(body_html, "html")
+    message.attach(body_part)
+
+    # PDF ATTACHMENT
+    attachment = MIMEApplication(pdf_bytes)
+
+    attachment.add_header(
+        "Content-Disposition",
+        "attachment",
+        filename=filename
+    )
+
+    message.attach(attachment)
+
+    ses.send_raw_email(
+        Source=os.getenv("SES_FROM_EMAIL"),
+        Destinations=[recipient_email],
+        RawMessage={
+            "Data": message.as_string()
         }
     )
