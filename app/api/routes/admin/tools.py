@@ -52,25 +52,31 @@ def send_invoice(
             status_code=400,
             detail="Organization email not found"
         )
-
-    # SEND EMAIL
-    send_invoice_email(
-        recipient_email=recipient_email,
-
-        subject=(
-            f"Invoice INV-{invoice_data['short_id']}"
-        ),
-
-        body_html=email_html,
-
-        pdf_bytes=pdf_buffer.getvalue(),
-
-        filename=(
-            f"INV-{invoice_data['short_id']}.pdf"
+    
+    try:
+        # SEND EMAIL (must return result now)
+        result = send_invoice_email(
+            recipient_email=recipient_email,
+            subject=f"Invoice INV-{invoice_data['short_id']}",
+            body_html=email_html,
+            pdf_bytes=pdf_buffer.getvalue(),
+            filename=f"INV-{invoice_data['short_id']}.pdf"
         )
-    )
 
-    return {
-        "success": True,
-        "message": "Invoice email sent"
-    }
+        if result and result.get("success") is False:
+            raise HTTPException(
+                status_code=500,
+                detail=result.get("error", "Email sending failed")
+            )
+
+        return {
+            "success": True,
+            "message": "Invoice email sent",
+            "message_id": result.get("message_id") if result else None
+        }
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e)
+        )

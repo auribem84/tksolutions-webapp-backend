@@ -3,6 +3,7 @@
 from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
+from botocore.exceptions import ClientError
 
 import boto3
 import os
@@ -72,10 +73,22 @@ def send_invoice_email(
 
     message.attach(attachment)
 
-    ses.send_raw_email(
-        Source=os.getenv("SES_FROM_EMAIL"),
-        Destinations=[recipient_email],
-        RawMessage={
-            "Data": message.as_string()
+    try:
+        response = ses.send_raw_email(
+            Source=os.getenv("SES_FROM_EMAIL"),
+            Destinations=[recipient_email],
+            RawMessage={
+                "Data": message.as_string(),
+            }
+        )
+
+        return {
+            "success": True,
+            "message_id": response["MessageId"]
         }
-    )
+
+    except ClientError as e:
+        return {
+            "success": False,
+            "error": e.response["Error"]["Message"]
+        }
