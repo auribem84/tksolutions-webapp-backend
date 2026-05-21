@@ -145,15 +145,16 @@ def download_invoice_pdf(
 
     pdf = generate_invoice_pdf(invoice_data)
 
-    print(invoice_data)
-    print(invoice_data["short_id"])
+    short_id = invoice_data["short_id"]
+
+    filename = f"INV-{short_id}.pdf"
 
     return StreamingResponse(
         pdf,
         media_type="application/pdf",
         headers={
             "Content-Disposition":
-            f"attachment; filename=invoice-{invoice_data['short_id']}.pdf"
+            f'attachment; filename="{filename}"'
         }
     )
 
