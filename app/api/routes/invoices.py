@@ -145,6 +145,9 @@ def download_invoice_pdf(
 
     pdf = generate_invoice_pdf(invoice_data)
 
+    print(invoice_data)
+    print(invoice_data["short_id"])
+
     return StreamingResponse(
         pdf,
         media_type="application/pdf",
