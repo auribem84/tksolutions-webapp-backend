@@ -115,7 +115,7 @@ def get_invoice_stats(
 # =========================================
 # DOWNLOAD INVOICE PDF
 # =========================================
-@router.get("/{invoice_id}/pdf")
+@router.get("/download/{invoice_id}")
 def download_invoice_pdf(
     invoice_id: str,
     db: Session = Depends(get_db),

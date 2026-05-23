@@ -82,12 +82,22 @@ def send_invoice_email(
             }
         )
 
+        print(
+            "EMAIL SENT:",
+            response["MessageId"]
+        )
+
         return {
             "success": True,
             "message_id": response["MessageId"]
         }
 
     except ClientError as e:
+        print(
+            "EMAIL ERROR:",
+            e.response["Error"]["Message"]
+        )
+
         return {
             "success": False,
             "error": e.response["Error"]["Message"]
