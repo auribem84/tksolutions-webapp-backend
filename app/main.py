@@ -18,6 +18,7 @@ from app.api.routes.admin import (
     organization_intelligence,
     organization_users,
     tools,
+    invoices as admin_invoices,
     projects as admin_projects,
     organizations as admin_organizations,
     users as admin_users
@@ -65,6 +66,7 @@ app.include_router(invitations.router, prefix="/admin/invitations", tags=["Admin
 app.include_router(admin_projects.router, prefix="/admin/projects", tags=["Admin"])
 app.include_router(admin_organizations.router, prefix="/admin/organizations",tags=["Admin"])
 app.include_router(admin_users.router,prefix="/admin/users",tags=["Admin"])
+app.include_router(admin_invoices.router,prefix="/admin/invoices",tags=["Admin"])
 app.include_router(bootstrap.router, prefix="/admin", tags=["Admin"])
 app.include_router(
     organization_intelligence.router,
