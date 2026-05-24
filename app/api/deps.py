@@ -11,6 +11,8 @@ from app.core.security import SECRET_KEY, ALGORITHM
 
 import os
 
+DEFAULT_ORG_ID = os.getenv("DEFAULT_ORG_ID")
+
 security = HTTPBearer()
 
 # =========================
@@ -28,6 +30,7 @@ def get_db():
 # CURRENT USER (DICT SIMPLE Y ESTABLE)
 # =========================
 def get_current_user(
+    
     credentials: HTTPAuthorizationCredentials = Depends(security),
     db: Session = Depends(get_db)
 ):
@@ -61,12 +64,18 @@ def get_current_user(
     if not role:
         raise HTTPException(status_code=500, detail="Role not found")
 
+    is_default_org_admin = (
+        user.organization_id == DEFAULT_ORG_ID
+        and role.name == "admin"
+    )
+
     return {
         "user_id": str(user.id),
         "organization_id": str(organization_id),
         "email": user.email,
         "role": role.name,
-        "role_id": str(role.id)
+        "role_id": str(role.id),
+        "is_default_org_admin": is_default_org_admin
     }
 
 
