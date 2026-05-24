@@ -9,6 +9,8 @@ from app.models.organization_user import OrganizationUser
 from app.core.security import verify_password, create_access_token
 from app.schemas.auth import LoginRequest, TokenResponse
 
+import os
+
 router = APIRouter()
 
 
