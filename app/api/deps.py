@@ -64,12 +64,18 @@ def get_current_user(
     if not role:
         raise HTTPException(status_code=500, detail="Role not found")
 
+    is_default_org_admin = (
+        organization_id == os.getenv("DEFAULT_ORG_ID")
+        and role.name == "admin"
+    )
+
     return {
         "user_id": str(user.id),
         "organization_id": str(organization_id),
         "email": user.email,
         "role": role.name,
-        "role_id": str(role.id)
+        "role_id": str(role.id),
+        "is_default_org_admin": is_default_org_admin
     }
 
 
