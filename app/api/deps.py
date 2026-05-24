@@ -63,10 +63,10 @@ def get_current_user(
     if not role:
         raise HTTPException(status_code=500, detail="Role not found")
 
-    is_default_org_admin = (
-        str(organization_id) == str(DEFAULT_ORG_ID)
-        and role.name == "admin"
-    )
+    # is_default_org_admin = (
+    #     str(organization_id) == str(DEFAULT_ORG_ID)
+    #     and role.name == "admin"
+    # )
 
     # DEBUG
     print("DEBUG DEFAULT_ORG_ID:", DEFAULT_ORG_ID)
@@ -79,8 +79,8 @@ def get_current_user(
         "organization_id": str(organization_id),
         "email": user.email,
         "role": role.name,
-        "role_id": str(role.id),
-        "is_default_org_admin": is_default_org_admin
+        "role_id": str(role.id)
+        # "is_default_org_admin": is_default_org_admin
     }
 
 

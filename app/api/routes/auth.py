@@ -51,6 +51,13 @@ def get_me(current_user=Depends(get_current_user), db: Session = Depends(get_db)
     user = db.query(User).filter(User.id == current_user["user_id"]).first()
     org = db.query(Organization).filter(Organization.id == current_user["organization_id"]).first()
 
+    default_org_id = os.getenv("DEFAULT_ORG_ID")
+
+    is_default_org_admin = (
+        str(current_user["organization_id"]) == str(default_org_id)
+        and current_user.get("role") == "admin"
+    )
+
     return {
         "email": user.email,
         "role": current_user.get("role", "User"),
@@ -58,5 +65,6 @@ def get_me(current_user=Depends(get_current_user), db: Session = Depends(get_db)
         "organization": org.name if org else None,
         "user_name": user.user_name,
         "user_lastname": user.user_lastname,
-        "full_name": f"{user.user_name} {user.user_lastname}"
+        "full_name": f"{user.user_name} {user.user_lastname}",
+        "is_default_org_admin": is_default_org_admin
     }
