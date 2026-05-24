@@ -8,10 +8,9 @@ from app.models.user import User
 from app.models.organization_user import OrganizationUser
 from app.models.role import Role
 from app.core.security import SECRET_KEY, ALGORITHM
+from app.core.constants import DEFAULT_ORG_ID
 
 import os
-
-default_org_id = os.getenv("DEFAULT_ORG_ID")
 
 security = HTTPBearer()
 
@@ -65,7 +64,7 @@ def get_current_user(
         raise HTTPException(status_code=500, detail="Role not found")
 
     is_default_org_admin = (
-        str(organization_id) == str(default_org_id)
+        str(organization_id) == str(DEFAULT_ORG_ID)
         and role.name == "admin"
     )
 
