@@ -65,7 +65,7 @@ def get_current_user(
         raise HTTPException(status_code=500, detail="Role not found")
 
     is_default_org_admin = (
-        user.organization_id == DEFAULT_ORG_ID
+        user.organization_id == str(DEFAULT_ORG_ID)
         and role.name == "admin"
     )
 
@@ -101,7 +101,7 @@ def require_default_admin(current_user=Depends(get_current_user)):
             detail="DEFAULT_ORG_ID not configured"
         )
 
-    if current_user["organization_id"] != default_org_id:
+    if current_user["organization_id"] != str(default_org_id):
         raise HTTPException(
             status_code=403,
             detail="Not default organization"
