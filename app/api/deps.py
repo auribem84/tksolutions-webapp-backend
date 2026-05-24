@@ -9,8 +9,9 @@ from app.models.organization_user import OrganizationUser
 from app.models.role import Role
 from app.core.security import SECRET_KEY, ALGORITHM
 
-security = HTTPBearer()
+import os
 
+security = HTTPBearer()
 
 # =========================
 # DB
@@ -80,13 +81,18 @@ def require_admin(current_user=Depends(get_current_user)):
         )
     return current_user
 
-# =========================
-# DEFAULT ORG ADMIN (SUPER ADMIN)
-# =========================
-DEFAULT_ORG_ID = "23158484-0000-0000-0000-000000000001"  # ajusta si usas otro
 
 def require_default_admin(current_user=Depends(get_current_user)):
-    if current_user["organization_id"] != DEFAULT_ORG_ID:
+    
+    default_org_id = os.getenv("DEFAULT_ORG_ID")
+    
+    if not default_org_id:
+        raise HTTPException(
+            status_code=500,
+            detail="DEFAULT_ORG_ID not configured"
+        )
+
+    if current_user["organization_id"] != default_org_id:
         raise HTTPException(
             status_code=403,
             detail="Not default organization"

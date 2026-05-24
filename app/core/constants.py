@@ -1,4 +1,8 @@
+import os
 import uuid
 
-DEFAULT_ORG_ID = uuid.UUID("23158484-0000-0000-0000-000000000001")
-DEFAULT_ADMIN_EMAIL = "superadmin@tk.com"
+DEFAULT_ORG_ID = uuid.UUID(
+    os.getenv("DEFAULT_ORG_ID")
+)
+
+DEFAULT_ADMIN_EMAIL = os.getenv("DEFAULT_ADMIN_EMAIL")
