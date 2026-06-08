@@ -79,6 +79,43 @@ def list_projects_with_tasks(
     return result
 
 
+@router.get("/{project_id}/tasks")
+def get_project_tasks(
+    project_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
+    tasks = db.query(Task).filter(Task.project_id == project_id).all()
+    return [
+        {
+            "id": str(t.id),
+            "title": t.title,
+            "status": t.status,
+            "assignee": t.assignee,
+            "due_date": str(t.due_date) if t.due_date else None,
+        }
+        for t in tasks
+    ]
+
+
+@router.patch("/tasks/{task_id}")
+def update_task(
+    task_id: str,
+    data: dict,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
+    task = db.query(Task).filter(Task.id == task_id).first()
+    if not task:
+        raise HTTPException(status_code=404, detail="Task not found")
+
+    if "status" in data:
+        task.status = data["status"]
+
+    db.commit()
+    return {"message": "Task updated"}
+
+
 @router.patch("/{project_id}")
 def update_project(
     project_id: str,
