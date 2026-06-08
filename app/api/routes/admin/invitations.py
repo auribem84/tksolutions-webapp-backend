@@ -7,79 +7,80 @@ import os
 
 from app.api.deps import get_db, require_default_admin
 from app.models.invitation import Invitation
+from app.models.user import User
+from app.models.role import Role
+from app.models.organization import Organization
+from app.models.organization_user import OrganizationUser
 from app.schemas.invitation import InvitationCreate, InvitationAccept
 from app.services.email_service import send_invitation_email
+from app.core.security import hash_password
 
 router = APIRouter()
 
 
-@router.post("/")
-def send_invitation(
-    data: InvitationCreate,
-    db: Session = Depends(get_db),
-):
-    token = str(uuid4())
-
-    invitation = Invitation(
-        email=data.email,
-        role=data.role,
-        organization_id=data.organization_id,
-        token=token,
-        expires_at=datetime.utcnow() + timedelta(days=7),
-    )
-
-    db.add(invitation)
-    db.commit()
-
-    invite_link = (
-        f"https://my.teknowsolutions.com/accept-invite?token={token}"
-    )
-
-    send_invitation_email(
-        data.email,
-        invite_link,
-    )
-
-    return {
-        "message": "Invitation sent"
-    }
-
-@router.post("/accept")
-def accept_invitation(
-    data: InvitationAccept,
-    db: Session = Depends(get_db),
-):
-    invitation = db.query(Invitation).filter(
-        Invitation.token == data.token
-    ).first()
+@router.get("/preview")
+def preview_invitation(token: str, db: Session = Depends(get_db)):
+    invitation = db.query(Invitation).filter(Invitation.token == token).first()
 
     if not invitation:
-        raise HTTPException(404, "Invalid invitation")
+        raise HTTPException(status_code=404, detail="Invalid invitation link.")
 
     if invitation.accepted:
-        raise HTTPException(400, "Already used invitation")
+        raise HTTPException(status_code=400, detail="This invitation has already been used.")
 
     if invitation.expires_at < datetime.utcnow():
-        raise HTTPException(400, "Invitation expired")
+        raise HTTPException(status_code=400, detail="This invitation has expired.")
 
-    # 🧠 crear usuario real
+    org = db.query(Organization).filter(Organization.id == invitation.organization_id).first()
+
+    return {
+        "email": invitation.email,
+        "organization": org.name if org else None,
+        "role": invitation.role,
+    }
+
+
+@router.post("/accept")
+def accept_invitation(data: InvitationAccept, db: Session = Depends(get_db)):
+    invitation = db.query(Invitation).filter(Invitation.token == data.token).first()
+
+    if not invitation:
+        raise HTTPException(status_code=404, detail="Invalid invitation link.")
+
+    if invitation.accepted:
+        raise HTTPException(status_code=400, detail="This invitation has already been used.")
+
+    if invitation.expires_at < datetime.utcnow():
+        raise HTTPException(status_code=400, detail="This invitation has expired.")
+
+    existing = db.query(User).filter(User.email == invitation.email).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="An account with this email already exists.")
+
     user = User(
         email=invitation.email,
-        full_name=data.full_name,
-        role=invitation.role,
-        organization_id=invitation.organization_id,
+        user_name=data.user_name,
+        user_lastname=data.user_lastname,
         hashed_password=hash_password(data.password),
         is_active=True,
     )
-
     db.add(user)
+    db.flush()
 
-    # marcar invitation como usada
+    role = db.query(Role).filter(Role.name == invitation.role).first()
+
+    org_user = OrganizationUser(
+        user_id=user.id,
+        organization_id=invitation.organization_id,
+        role_id=role.id if role else None,
+    )
+    db.add(org_user)
+
     invitation.accepted = True
-
     db.commit()
 
-    return {"message": "Account created successfully"}
+    return {"message": "Account created successfully."}
+
 
 @router.post("/send")
 def send_invitation_admin(data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):

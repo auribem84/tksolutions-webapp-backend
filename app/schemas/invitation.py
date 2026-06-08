@@ -10,5 +10,6 @@ class InvitationCreate(BaseModel):
 
 class InvitationAccept(BaseModel):
     token: str
-    full_name: str
+    user_name: str
+    user_lastname: str
     password: str
