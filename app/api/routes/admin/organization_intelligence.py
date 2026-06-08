@@ -7,6 +7,7 @@ from app.models.project import Project
 from app.models.ticket import Ticket
 from app.models.organization import Organization
 from app.models.user import User
+from app.models.role import Role
 from app.models.service import Service
 from app.models.organization_user import OrganizationUser
 
@@ -19,15 +20,11 @@ def users(
     user=Depends(require_default_admin)
 ):
 
-    users = (
-        db.query(User)
-        .join(
-            OrganizationUser,
-            OrganizationUser.user_id == User.id
-        )
-        .filter(
-            OrganizationUser.organization_id == org_id
-        )
+    rows = (
+        db.query(User, OrganizationUser, Role)
+        .join(OrganizationUser, OrganizationUser.user_id == User.id)
+        .outerjoin(Role, Role.id == OrganizationUser.role_id)
+        .filter(OrganizationUser.organization_id == org_id)
         .all()
     )
 
@@ -35,8 +32,12 @@ def users(
         {
             "id": str(u.id),
             "email": u.email,
+            "user_name": u.user_name,
+            "user_lastname": u.user_lastname,
+            "full_name": f"{u.user_name} {u.user_lastname}",
+            "role": r.name if r else "user",
         }
-        for u in users
+        for u, ou, r in rows
     ]
 
 
@@ -55,6 +56,7 @@ def services(
         {
             "id": str(s.id),
             "name": s.name,
+            "description": s.description,
             "status": s.status,
         }
         for s in services

@@ -1,8 +1,8 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from uuid import uuid4
 
-from app.api.deps import get_db, require_admin
+from app.api.deps import get_db, require_admin, require_default_admin
 from app.models.project import Project
 from app.models.task import Task
 
@@ -77,3 +77,40 @@ def list_projects_with_tasks(
         })
 
     return result
+
+
+@router.patch("/{project_id}")
+def update_project(
+    project_id: str,
+    data: dict,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    if "name" in data:
+        project.name = data["name"]
+    if "description" in data:
+        project.description = data["description"]
+    if "status" in data:
+        project.status = data["status"]
+
+    db.commit()
+    return {"message": "Project updated"}
+
+
+@router.delete("/{project_id}")
+def delete_project(
+    project_id: str,
+    db: Session = Depends(get_db),
+    user=Depends(require_default_admin),
+):
+    project = db.query(Project).filter(Project.id == project_id).first()
+    if not project:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    db.delete(project)
+    db.commit()
+    return {"message": "Project deleted"}

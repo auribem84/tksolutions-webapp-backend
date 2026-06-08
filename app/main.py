@@ -21,7 +21,8 @@ from app.api.routes.admin import (
     invoices as admin_invoices,
     projects as admin_projects,
     organizations as admin_organizations,
-    users as admin_users
+    users as admin_users,
+    services as admin_services,
 )
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
@@ -64,6 +65,7 @@ app.include_router(organizations.router, prefix="/organizations", tags=["Organiz
 # ADMIN
 app.include_router(invitations.router, prefix="/admin/invitations", tags=["Admin"])
 app.include_router(admin_projects.router, prefix="/admin/projects", tags=["Admin"])
+app.include_router(admin_services.router, prefix="/admin/services", tags=["Admin"])
 app.include_router(admin_organizations.router, prefix="/admin/organizations",tags=["Admin"])
 app.include_router(admin_users.router,prefix="/admin/users",tags=["Admin"])
 app.include_router(admin_invoices.router,prefix="/admin/invoices",tags=["Admin"])
