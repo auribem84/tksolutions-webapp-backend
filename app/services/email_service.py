@@ -44,6 +44,39 @@ def send_invitation_email(to_email: str, invite_link: str):
         }
     )
 
+def send_password_reset_email(to_email: str, reset_link: str):
+    ses.send_email(
+        Source=os.getenv("SES_FROM_EMAIL"),
+        Destination={
+            "ToAddresses": [to_email]
+        },
+        Message={
+            "Subject": {
+                "Data": "Reset your Teknow Solutions password"
+            },
+            "Body": {
+                "Html": {
+                    "Data": f"""
+                    <h2>Password Reset</h2>
+
+                    <p>We received a request to reset your password.</p>
+
+                    <p>This link will expire in 30 minutes.</p>
+
+                    <p>
+                        <a href="{reset_link}">
+                            Reset Password
+                        </a>
+                    </p>
+
+                    <p>If you didn't request this, you can safely ignore this email.</p>
+                    """
+                }
+            }
+        }
+    )
+
+
 def send_invoice_email(
     recipient_email: str,
     subject: str,

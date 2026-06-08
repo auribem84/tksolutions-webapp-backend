@@ -23,3 +23,6 @@ class User(Base):
 
     modified_at = Column(DateTime)
     modified_by = Column(UUID(as_uuid=True), ForeignKey("users.id"))
+
+    reset_token = Column(String(255), nullable=True)
+    reset_token_expires_at = Column(DateTime, nullable=True)
