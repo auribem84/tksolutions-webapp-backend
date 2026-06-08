@@ -3,6 +3,7 @@ from sqlalchemy.orm import Session
 
 from uuid import uuid4
 from datetime import datetime, timedelta
+import os
 
 from app.api.deps import get_db, require_default_admin
 from app.models.invitation import Invitation
@@ -81,15 +82,29 @@ def accept_invitation(
     return {"message": "Account created successfully"}
 
 @router.post("/send")
-def send_invitation(data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+def send_invitation_admin(data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    email = data.get("email")
+    organization_id = data.get("organization_id")
+    role = data.get("role", "user")
+
+    if not email or not organization_id:
+        raise HTTPException(status_code=422, detail="email and organization_id are required")
+
     token = str(uuid4())
 
-    invite_link = f"http://localhost:8080/onboarding?token={token}"
-
-    send_email(
-        to=data["email"],
-        subject="You're invited",
-        body=f"Click here: {invite_link}"
+    invitation = Invitation(
+        email=email,
+        role=role,
+        organization_id=organization_id,
+        token=token,
+        expires_at=datetime.utcnow() + timedelta(days=7),
     )
+    db.add(invitation)
+    db.commit()
+
+    frontend_url = os.getenv("FRONTEND_URL", "https://my.teknowsolutions.com")
+    invite_link = f"{frontend_url}/accept-invite?token={token}"
+
+    send_invitation_email(email, invite_link)
 
     return {"message": "Invitation sent"}
