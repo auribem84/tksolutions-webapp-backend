@@ -36,6 +36,7 @@ def users(
             "user_lastname": u.user_lastname,
             "full_name": f"{u.user_name} {u.user_lastname}",
             "role": r.name if r else "user",
+            "is_active": u.is_active,
         }
         for u, ou, r in rows
     ]
