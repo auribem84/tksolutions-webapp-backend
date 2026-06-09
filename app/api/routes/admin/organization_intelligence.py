@@ -1,10 +1,10 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_default_admin
 from app.models.invoice import Invoice
 from app.models.project import Project
-from app.models.ticket import Ticket
+from app.models.ticket import Ticket, TicketMessage
 from app.models.organization import Organization
 from app.models.user import User
 from app.models.role import Role
@@ -89,5 +89,71 @@ def projects(org_id: str, db: Session = Depends(get_db), user=Depends(require_de
 
 
 @router.get("/{org_id}/tickets")
-def tickets(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
-    return db.query(Ticket).filter(Ticket.organization_id == org_id).all()
+def get_tickets(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    ticket_rows = db.query(Ticket).filter(Ticket.organization_id == org_id).order_by(Ticket.created_at.desc()).all()
+
+    result = []
+    for t in ticket_rows:
+        messages = (
+            db.query(TicketMessage)
+            .filter(TicketMessage.ticket_id == t.id)
+            .order_by(TicketMessage.created_at.asc())
+            .all()
+        )
+        result.append({
+            "id": t.id,
+            "ref": t.ref,
+            "subject": t.subject,
+            "status": t.status,
+            "priority": t.priority,
+            "assignee": t.assignee or "Unassigned",
+            "created": t.created_at.strftime("%b %d, %Y") if t.created_at else None,
+            "messages": [
+                {
+                    "sender": m.sender,
+                    "text": m.text,
+                    "time": m.created_at.strftime("%b %d, %I:%M %p") if m.created_at else None,
+                }
+                for m in messages
+            ],
+        })
+    return result
+
+
+@router.post("/{org_id}/tickets/{ticket_id}/messages")
+def reply_ticket(
+    org_id: str,
+    ticket_id: str,
+    data: dict,
+    db: Session = Depends(get_db),
+    admin=Depends(require_default_admin),
+):
+    ticket = db.query(Ticket).filter(
+        Ticket.id == ticket_id,
+        Ticket.organization_id == org_id,
+    ).first()
+
+    if not ticket:
+        raise HTTPException(status_code=404, detail="Ticket not found")
+
+    text = data.get("text", "").strip()
+    if not text:
+        raise HTTPException(status_code=422, detail="Reply text is required")
+
+    admin_user = db.query(User).filter(User.id == admin["user_id"]).first()
+    sender = admin_user.email if admin_user else "Admin"
+
+    message = TicketMessage(ticket_id=ticket.id, sender=sender, text=text)
+    db.add(message)
+
+    ticket.status = "in_progress"
+    ticket.updated_at = __import__("datetime").datetime.utcnow()
+
+    db.commit()
+    db.refresh(message)
+
+    return {
+        "sender": message.sender,
+        "text": message.text,
+        "time": message.created_at.strftime("%b %d, %I:%M %p") if message.created_at else None,
+    }
