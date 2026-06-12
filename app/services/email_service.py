@@ -6,6 +6,7 @@ from email.mime.application import MIMEApplication
 from botocore.exceptions import ClientError
 from jinja2 import Environment, FileSystemLoader
 
+import base64
 import boto3
 import os
 
@@ -14,6 +15,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 templates = Environment(
     loader=FileSystemLoader(os.path.join(BASE_DIR, "templates"))
 )
+
+with open(os.path.join(BASE_DIR, "assets", "logo.png"), "rb") as _f:
+    _LOGO_BASE64 = base64.b64encode(_f.read()).decode()
 
 ses = boto3.client(
     "ses",
@@ -25,7 +29,8 @@ ses = boto3.client(
 
 def send_invitation_email(to_email: str, invite_link: str):
     html = templates.get_template("email_invitation.html").render(
-        invite_link=invite_link
+        invite_link=invite_link,
+        logo_base64=_LOGO_BASE64,
     )
 
     ses.send_email(
