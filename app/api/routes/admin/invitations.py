@@ -14,8 +14,6 @@ from app.schemas.invitation import InvitationCreate, InvitationAccept
 from app.services.email_service import send_invitation_email
 from app.core.security import hash_password
 
-DEFAULT_ROLE_ID = "a29fb390-86cd-4514-ac88-050d4af00ec1"
-
 router = APIRouter()
 
 
@@ -71,7 +69,7 @@ def accept_invitation(data: InvitationAccept, db: Session = Depends(get_db)):
     org_user = OrganizationUser(
         user_id=user.id,
         organization_id=invitation.organization_id,
-        role_id=DEFAULT_ROLE_ID,
+        role_id=os.getenv("DEFAULT_ROLE_ID"),
     )
     db.add(org_user)
 
