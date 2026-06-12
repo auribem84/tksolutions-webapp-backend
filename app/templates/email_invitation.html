@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>You're Invited</title>
+</head>
+<body style="margin:0;padding:0;background-color:#f4f4f4;font-family:Arial,sans-serif;">
+
+  <!-- Outer wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" border="0"
+         style="background-color:#f4f4f4;padding:40px 0;">
+    <tr>
+      <td align="center">
+
+        <!-- Inner card -->
+        <table width="600" cellpadding="0" cellspacing="0" border="0"
+               style="background-color:#ffffff;border-radius:6px;overflow:hidden;">
+
+          <!-- Header -->
+          <tr>
+            <td style="padding:32px 48px;border-bottom:1px solid #eeeeee;">
+              <span style="font-size:20px;font-weight:bold;color:#111111;">
+                Teknow Solutions
+              </span>
+            </td>
+          </tr>
+
+          <!-- Body -->
+          <tr>
+            <td style="padding:40px 48px;color:#333333;font-size:15px;line-height:1.6;">
+
+              <p style="margin:0 0 16px 0;">Hello,</p>
+
+              <p style="margin:0 0 16px 0;">
+                You have been invited to join the Teknow Solutions Portal.
+              </p>
+
+              <p style="margin:0 0 32px 0;">
+                Click the button below to accept your invitation and set up your account.
+                This link is unique to you — please do not share it.
+              </p>
+
+              <!-- CTA button -->
+              <table cellpadding="0" cellspacing="0" border="0" style="margin-bottom:16px;">
+                <tr>
+                  <td align="center"
+                      style="background-color:#111111;border-radius:4px;padding:14px 32px;">
+                    <a href="{{ invite_link }}"
+                       style="color:#ffffff;font-size:15px;font-weight:bold;
+                              text-decoration:none;display:inline-block;">
+                      Accept Invitation
+                    </a>
+                  </td>
+                </tr>
+              </table>
+
+              <!-- Fallback plain-text link -->
+              <p style="margin:0;font-size:13px;color:#777777;">
+                If the button above doesn't work, copy and paste this link into your browser:<br />
+                <a href="{{ invite_link }}" style="color:#111111;word-break:break-all;">
+                  {{ invite_link }}
+                </a>
+              </p>
+
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td style="background-color:#111111;padding:32px 48px;">
+              <p style="margin:0 0 8px 0;font-size:13px;color:#aaaaaa;">
+                Please do not reply to this email — this mailbox is not monitored.
+              </p>
+              <p style="margin:0 0 16px 0;font-size:13px;color:#aaaaaa;">
+                If you were not expecting this invitation, you can safely ignore this email.
+              </p>
+              <p style="margin:0;font-size:12px;color:#666666;">
+                &copy; 2026 Teknow Solutions. All Rights Reserved.
+              </p>
+            </td>
+          </tr>
+
+        </table>
+        <!-- /Inner card -->
+
+      </td>
+    </tr>
+  </table>
+  <!-- /Outer wrapper -->
+
+</body>
+</html>

@@ -4,9 +4,16 @@ from email.mime.multipart import MIMEMultipart
 from email.mime.text import MIMEText
 from email.mime.application import MIMEApplication
 from botocore.exceptions import ClientError
+from jinja2 import Environment, FileSystemLoader
 
 import boto3
 import os
+
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+templates = Environment(
+    loader=FileSystemLoader(os.path.join(BASE_DIR, "templates"))
+)
 
 ses = boto3.client(
     "ses",
@@ -17,6 +24,10 @@ ses = boto3.client(
 
 
 def send_invitation_email(to_email: str, invite_link: str):
+    html = templates.get_template("email_invitation.html").render(
+        invite_link=invite_link
+    )
+
     ses.send_email(
         Source=os.getenv("SES_FROM_EMAIL"),
         Destination={
@@ -28,17 +39,7 @@ def send_invitation_email(to_email: str, invite_link: str):
             },
             "Body": {
                 "Html": {
-                    "Data": f"""
-                    <h2>Welcome</h2>
-
-                    <p>You have been invited to join the portal.</p>
-
-                    <p>
-                        <a href="{invite_link}">
-                            Accept Invitation
-                        </a>
-                    </p>
-                    """
+                    "Data": html
                 }
             }
         }
