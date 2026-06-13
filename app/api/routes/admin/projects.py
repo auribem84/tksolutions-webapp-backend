@@ -29,7 +29,7 @@ def create_project_with_tasks(
         name=data["name"],
         description=data.get("description"),
         notes=data.get("notes"),
-        status=data.get("status", "active"),
+        status=data.get("status", "planning"),
         start_date=data.get("start_date"),
         due_date=data.get("due_date"),
         organization_id=data["organization_id"],

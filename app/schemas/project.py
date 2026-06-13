@@ -37,7 +37,7 @@ class TaskCreate(BaseModel):
 class ProjectWithTasksCreate(BaseModel):
     name: str
     description: Optional[str] = None
-    status: str = "active"
+    status: str = "planning"
     start_date: Optional[date] = None
     due_date: Optional[date] = None
     organization_id: str

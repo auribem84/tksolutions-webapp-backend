@@ -7,9 +7,13 @@ import enum
 from app.db.base import Base
 
 class ProjectStatus(str, enum.Enum):
-    active = "active"
+    planning = "planning"
+    in_progress = "in_progress"
+    in_review = "in_review"
     on_hold = "on_hold"
     completed = "completed"
+    support = "support"
+    cancelled = "cancelled"
     archived = "archived"
 
 class Project(Base):
@@ -20,7 +24,7 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     notes = Column(Text, nullable=True)
-    status = Column(Enum(ProjectStatus), default=ProjectStatus.active)
+    status = Column(Enum(ProjectStatus), default=ProjectStatus.planning)
 
     start_date = Column(Date)
     due_date = Column(Date)
