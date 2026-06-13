@@ -85,7 +85,18 @@ def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_de
 
 @router.get("/{org_id}/projects")
 def projects(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
-    return db.query(Project).filter(Project.organization_id == org_id).all()
+    rows = db.query(Project).filter(Project.organization_id == org_id).all()
+    return [
+        {
+            "id": str(p.id),
+            "project_tag": p.project_tag,
+            "name": p.name,
+            "description": p.description,
+            "notes": p.notes,
+            "status": p.status,
+        }
+        for p in rows
+    ]
 
 
 @router.get("/{org_id}/tickets")

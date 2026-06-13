@@ -1,7 +1,8 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, validator
 from typing import Optional
 from datetime import datetime
 from uuid import UUID
+import re
 
 
 class OrganizationCreate(BaseModel):
@@ -24,6 +25,15 @@ class OrganizationContactCreate(BaseModel):
     contact_email: Optional[str] = None
     contact_phone: Optional[str] = None
     contact_mobile: Optional[str] = None
+
+    @validator("contact_mobile", pre=True)
+    def clean_phone(cls, v):
+        if v is None:
+            return v
+        cleaned = re.sub(r"[^\d+]", "", v)
+        if len(cleaned) < 10 or len(cleaned) > 15:
+            raise ValueError("Invalid phone number length.")
+        return cleaned
 
 
 class OrganizationCreateFull(BaseModel):

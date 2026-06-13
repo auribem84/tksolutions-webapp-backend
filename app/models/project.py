@@ -1,5 +1,5 @@
 import uuid
-from sqlalchemy import Column, String, Date, ForeignKey, Enum, Integer
+from sqlalchemy import Column, String, Date, ForeignKey, Enum, Integer, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import enum
@@ -16,8 +16,10 @@ class Project(Base):
     __tablename__ = "projects"
 
     id = Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
+    project_tag = Column(String(12), unique=True, nullable=True)
     name = Column(String, nullable=False)
     description = Column(String)
+    notes = Column(Text, nullable=True)
     status = Column(Enum(ProjectStatus), default=ProjectStatus.active)
 
     start_date = Column(Date)

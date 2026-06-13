@@ -1,12 +1,20 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from uuid import uuid4
+from datetime import datetime
 
 from app.api.deps import get_db, require_admin, require_default_admin
 from app.models.project import Project
 from app.models.task import Task
 
 router = APIRouter()
+
+
+def _generate_project_tag(db: Session) -> str:
+    year_str = datetime.utcnow().strftime("%y")
+    prefix = f"PRJ-{year_str}"
+    count = db.query(Project).filter(Project.project_tag.like(f"{prefix}%")).count()
+    return f"{prefix}{count + 1:04d}"
 
 
 @router.post("/")
@@ -17,8 +25,10 @@ def create_project_with_tasks(
 ):
     project = Project(
         id=uuid4(),
+        project_tag=_generate_project_tag(db),
         name=data["name"],
         description=data.get("description"),
+        notes=data.get("notes"),
         status=data.get("status", "active"),
         start_date=data.get("start_date"),
         due_date=data.get("due_date"),
@@ -131,6 +141,8 @@ def update_project(
         project.name = data["name"]
     if "description" in data:
         project.description = data["description"]
+    if "notes" in data:
+        project.notes = data["notes"]
     if "status" in data:
         project.status = data["status"]
 
