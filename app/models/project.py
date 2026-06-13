@@ -1,20 +1,9 @@
 import uuid
-from sqlalchemy import Column, String, Date, ForeignKey, Enum, Integer, Text
+from sqlalchemy import Column, String, Date, ForeignKey, Text
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-import enum
 
 from app.db.base import Base
-
-class ProjectStatus(str, enum.Enum):
-    planning = "planning"
-    in_progress = "in_progress"
-    in_review = "in_review"
-    on_hold = "on_hold"
-    completed = "completed"
-    support = "support"
-    cancelled = "cancelled"
-    archived = "archived"
 
 class Project(Base):
     __tablename__ = "projects"
@@ -24,7 +13,7 @@ class Project(Base):
     name = Column(String, nullable=False)
     description = Column(String)
     notes = Column(Text, nullable=True)
-    status = Column(Enum(ProjectStatus), default=ProjectStatus.planning)
+    status = Column(String(50), default="planning")
 
     start_date = Column(Date)
     due_date = Column(Date)
