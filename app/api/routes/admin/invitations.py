@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
 from sqlalchemy.orm import Session
 
 from uuid import uuid4
@@ -10,6 +10,7 @@ from app.models.invitation import Invitation
 from app.models.user import User
 from app.models.organization import Organization
 from app.models.organization_user import OrganizationUser
+from app.models.user_legal_acceptance import UserLegalAcceptance
 from app.schemas.invitation import InvitationCreate, InvitationAccept
 from app.services.email_service import send_invitation_email, send_welcome_email
 from app.core.security import hash_password
@@ -40,7 +41,7 @@ def preview_invitation(token: str, db: Session = Depends(get_db)):
 
 
 @router.post("/accept")
-def accept_invitation(data: InvitationAccept, db: Session = Depends(get_db)):
+def accept_invitation(data: InvitationAccept, request: Request, db: Session = Depends(get_db)):
     invitation = db.query(Invitation).filter(Invitation.token == data.token).first()
 
     if not invitation:
@@ -74,6 +75,27 @@ def accept_invitation(data: InvitationAccept, db: Session = Depends(get_db)):
     db.add(org_user)
 
     invitation.accepted = True
+
+    accepted_at = datetime.utcnow()
+    ip_address = request.headers.get("x-forwarded-for", "").split(",")[0].strip() or (
+        request.client.host if request.client else None
+    )
+    user_agent = request.headers.get("user-agent")
+
+    for doc_type, doc_version in [
+        ("terms", data.terms_version),
+        ("privacy", data.privacy_version),
+    ]:
+        db.add(UserLegalAcceptance(
+            organization_id=invitation.organization_id,
+            user_id=user.id,
+            document_type=doc_type,
+            document_version=doc_version,
+            accepted_at=accepted_at,
+            ip_address=ip_address,
+            user_agent=user_agent,
+        ))
+
     db.commit()
 
     try:
