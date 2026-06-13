@@ -11,7 +11,7 @@ from app.models.user import User
 from app.models.organization import Organization
 from app.models.organization_user import OrganizationUser
 from app.schemas.invitation import InvitationCreate, InvitationAccept
-from app.services.email_service import send_invitation_email
+from app.services.email_service import send_invitation_email, send_welcome_email
 from app.core.security import hash_password
 
 router = APIRouter()
@@ -75,6 +75,11 @@ def accept_invitation(data: InvitationAccept, db: Session = Depends(get_db)):
 
     invitation.accepted = True
     db.commit()
+
+    try:
+        send_welcome_email(invitation.email, data.user_name)
+    except Exception as e:
+        print(f"WELCOME EMAIL ERROR: {e}")
 
     return {"message": "Account created successfully."}
 

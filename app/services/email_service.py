@@ -45,6 +45,32 @@ def send_invitation_email(to_email: str, invite_link: str):
         }
     )
 
+def send_welcome_email(to_email: str, first_name: str):
+    frontend_url = os.getenv("FRONTEND_URL", "https://my.teknowsolutions.com")
+
+    html = templates.get_template("email_welcome.html").render(
+        first_name=first_name,
+        login_link=f"{frontend_url}/login",
+    )
+
+    ses.send_email(
+        Source=os.getenv("SES_FROM_EMAIL"),
+        Destination={
+            "ToAddresses": [to_email]
+        },
+        Message={
+            "Subject": {
+                "Data": "Welcome to Teknowsolutions, LLC Customer Portal"
+            },
+            "Body": {
+                "Html": {
+                    "Data": html
+                }
+            }
+        }
+    )
+
+
 def send_password_reset_email(to_email: str, reset_link: str):
     ses.send_email(
         Source=os.getenv("SES_FROM_EMAIL"),
