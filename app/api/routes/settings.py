@@ -108,14 +108,13 @@ def get_team(
 
     return [
         {
-            "id": u.id,
+            "id": str(u.id),
             "email": u.email,
-            "user_name": u.user_name,
-            "user_lastname": u.user_lastname,
-            "full_name": f"{u.user_name} {u.user_lastname}",
+            "user_name": u.user_name or "",
+            "user_lastname": u.user_lastname or "",
             "role": r.name,
-            "status": "active",
-            "last_login": "2 hours ago",
+            "is_active": u.is_active,
+            "created_at": u.created_at.strftime("%Y-%m-%d") if u.created_at else None,
         }
         for u, ou, r in results
     ]
@@ -154,29 +153,28 @@ def get_organization(
         )
 
     return {
-        "id": org.id,
+        "id": str(org.id),
         "name": org.name,
         "status": org.status,
         "itin": profile.itin if profile else None,
-
-        # primary contact
-        "contact": next(
-            (c for c in contacts if c.is_primary),
-            None
-        ),
-
-        # all contacts
+        "address1": profile.address1 if profile else None,
+        "address2": profile.address2 if profile else None,
+        "city": profile.city if profile else None,
+        "state": profile.state if profile else None,
+        "zip": profile.zip if profile else None,
+        "phone": profile.phone if profile else None,
+        "email": profile.email if profile else None,
         "contacts": [
             {
-                "id": c.id,
-                "contact_name": c.contact_name,
-                "contact_lastname": c.contact_lastname,
-                "contact_title": c.contact_title,
-                "contact_email": c.contact_email,
-                "contact_phone": c.contact_phone,
-                "contact_mobile": c.contact_mobile,
-                "is_primary": c.is_primary,
+                "id": str(c.id),
+                "contact_name": c.contact_name or "",
+                "contact_lastname": c.contact_lastname or "",
+                "contact_title": c.contact_title or "",
+                "contact_email": c.contact_email or "",
+                "contact_phone": c.contact_phone or "",
+                "contact_mobile": c.contact_mobile or "",
+                "is_primary": c.is_primary or False,
             }
             for c in contacts
-        ]
+        ],
     }
