@@ -283,6 +283,88 @@ def create_organization_full(
     }
 
 
+@router.get("/{org_id}/full")
+def get_organization_full(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    org = db.query(Organization).filter(Organization.id == org_id).first()
+    if not org:
+        raise HTTPException(404, "Not found")
+    profile = db.query(OrganizationProfile).filter(OrganizationProfile.organization_id == org_id).first()
+    contacts = db.query(OrganizationContact).filter(OrganizationContact.organization_id == org_id).order_by(OrganizationContact.created_at).all()
+    return {
+        "id": str(org.id),
+        "name": org.name,
+        "profile": {
+            "itin": profile.itin or "",
+            "address1": profile.address1 or "",
+            "address2": profile.address2 or "",
+            "city": profile.city or "",
+            "state": profile.state or "",
+            "zip": profile.zip or "",
+            "phone": profile.phone or "",
+            "email": profile.email or "",
+        } if profile else {},
+        "contacts": [
+            {
+                "id": str(c.id),
+                "contact_name": c.contact_name or "",
+                "contact_lastname": c.contact_lastname or "",
+                "contact_title": c.contact_title or "",
+                "contact_email": c.contact_email or "",
+                "contact_phone": c.contact_phone or "",
+                "contact_mobile": c.contact_mobile or "",
+                "is_primary": c.is_primary or False,
+            }
+            for c in contacts
+        ],
+    }
+
+
+@router.post("/{org_id}/contacts")
+def create_contact(org_id: str, data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    contact = OrganizationContact(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        contact_name=data.get("contact_name", ""),
+        contact_lastname=data.get("contact_lastname"),
+        contact_title=data.get("contact_title"),
+        contact_email=data.get("contact_email"),
+        contact_phone=data.get("contact_phone"),
+        contact_mobile=data.get("contact_mobile"),
+        is_primary=data.get("is_primary", False),
+    )
+    db.add(contact)
+    db.commit()
+    return {"id": str(contact.id), "message": "Contact created"}
+
+
+@router.patch("/{org_id}/contacts/{contact_id}")
+def update_contact(org_id: str, contact_id: str, data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    contact = db.query(OrganizationContact).filter(
+        OrganizationContact.id == contact_id,
+        OrganizationContact.organization_id == org_id,
+    ).first()
+    if not contact:
+        raise HTTPException(404, "Contact not found")
+    for field in ("contact_name", "contact_lastname", "contact_title", "contact_email", "contact_phone", "contact_mobile", "is_primary"):
+        if field in data:
+            setattr(contact, field, data[field])
+    db.commit()
+    return {"message": "Contact updated"}
+
+
+@router.delete("/{org_id}/contacts/{contact_id}")
+def delete_contact(org_id: str, contact_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    contact = db.query(OrganizationContact).filter(
+        OrganizationContact.id == contact_id,
+        OrganizationContact.organization_id == org_id,
+    ).first()
+    if not contact:
+        raise HTTPException(404, "Contact not found")
+    db.delete(contact)
+    db.commit()
+    return {"message": "Contact deleted"}
+
+
 @router.get("/{org_id:uuid}")
 def get_organization(org_id: UUID, db: Session = Depends(get_db), user=Depends(require_default_admin)):
     org = db.query(Organization).filter(Organization.id == org_id).first()
