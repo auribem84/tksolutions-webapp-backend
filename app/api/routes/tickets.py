@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 from app.api.deps import get_db, get_current_user
 from app.models.ticket import Ticket, TicketMessage
 from app.services.ticket_ref import generate_ticket_ref
+from app.utils.slack import notify_new_ticket
 
 router = APIRouter()
 
@@ -77,6 +78,13 @@ def create_ticket(
     db.add(first_message)
     db.commit()
     db.refresh(first_message)
+
+    notify_new_ticket(
+        ref=ticket.ref,
+        subject=ticket.subject,
+        priority=ticket.priority,
+        created_by=current_user["email"],
+    )
 
     return {
         "id": ticket.id,

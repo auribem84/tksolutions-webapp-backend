@@ -29,6 +29,8 @@ IS_EXTERNAL_DB = ENV == "production"
 # =========================
 # AUTH
 # =========================
+SLACK_WEBHOOK_URL = os.getenv("SLACK_WEBHOOK_URL")
+
 SECRET_KEY = os.getenv("SECRET_KEY", "supersecret")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
