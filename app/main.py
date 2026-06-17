@@ -27,7 +27,7 @@ from app.api.routes.admin import (
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
 
-app = FastAPI(title="Customer Portal API")
+app = FastAPI(title="Customer Portal API", redirect_slashes=False)
 
 # 🌐 CORS FIX REAL
 origins = [
