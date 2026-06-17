@@ -26,7 +26,7 @@ router = APIRouter()
 # =========================================
 # LIST INVOICES (ORG SAFE - FIXED)
 # =========================================
-@router.get("/", response_model=List[InvoiceOut])
+@router.get("", response_model=List[InvoiceOut])
 def get_invoices(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
