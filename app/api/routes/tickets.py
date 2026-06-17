@@ -9,7 +9,7 @@ from app.utils.slack import notify_new_ticket
 router = APIRouter()
 
 
-@router.get("/")
+@router.get("")
 def get_tickets(
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
@@ -48,7 +48,7 @@ def get_tickets(
 
     return result
 
-@router.post("/")
+@router.post("")
 def create_ticket(
     data: dict,
     db: Session = Depends(get_db),
