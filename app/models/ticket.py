@@ -34,6 +34,8 @@ class TicketMessage(Base):
     ticket_id = Column(String, ForeignKey("tickets.id"))
     sender = Column(String)
     text = Column(Text)
+    source = Column(String, nullable=False, default="app")
+    sender_phone = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)
 
