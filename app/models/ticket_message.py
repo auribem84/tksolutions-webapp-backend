@@ -14,5 +14,7 @@ class TicketMessage(Base):
 
     sender = Column(String)
     text = Column(Text, nullable=False)
+    source = Column(String, nullable=False, default="app")
+    sender_phone = Column(String, nullable=True)
 
     created_at = Column(DateTime, default=datetime.utcnow)

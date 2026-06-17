@@ -39,6 +39,8 @@ def get_tickets(
                     "sender": m.sender,
                     "time": m.created_at.strftime("%b %d, %I:%M %p"),
                     "text": m.text,
+                    "source": m.source,
+                    "sender_phone": m.sender_phone,
                 }
                 for m in messages
             ],
@@ -73,6 +75,7 @@ def create_ticket(
         ticket_id=ticket.id,
         sender=current_user["email"],
         text=data.get("description", ""),
+        source="app",
     )
 
     db.add(first_message)
@@ -100,6 +103,8 @@ def create_ticket(
                 "sender": first_message.sender,
                 "time": first_message.created_at.strftime("%H:%M"),
                 "text": first_message.text,
+                "source": first_message.source,
+                "sender_phone": first_message.sender_phone,
             }
         ],
     }
@@ -119,8 +124,10 @@ def add_message(
 
     message = TicketMessage(
         ticket_id=ticket.id,
-        sender=current_user["email"],  # o name
+        sender=current_user["email"],
         text=data["text"],
+        source=data.get("source", "app"),
+        sender_phone=data.get("sender_phone"),
     )
 
     db.add(message)
@@ -131,4 +138,6 @@ def add_message(
         "sender": message.sender,
         "text": message.text,
         "time": message.created_at.strftime("%b %d, %H:%M"),
+        "source": message.source,
+        "sender_phone": message.sender_phone,
     }
