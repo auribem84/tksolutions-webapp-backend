@@ -5,6 +5,8 @@ from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_default_admin
 from app.models.user import User
+from app.models.organization_user import OrganizationUser
+from app.models.user_legal_acceptance import UserLegalAcceptance
 
 router = APIRouter()
 
@@ -29,6 +31,19 @@ def update_user(user_id: str, data: dict, db: Session = Depends(get_db), user=De
 
     db.commit()
     return {"message": "User updated"}
+
+
+@router.delete("/{user_id}", status_code=204)
+def delete_user(user_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    u = db.query(User).filter(User.id == user_id).first()
+
+    if not u:
+        raise HTTPException(status_code=404, detail="User not found")
+
+    db.query(UserLegalAcceptance).filter(UserLegalAcceptance.user_id == user_id).delete()
+    db.query(OrganizationUser).filter(OrganizationUser.user_id == user_id).delete()
+    db.delete(u)
+    db.commit()
 
 
 @router.patch("/{user_id}/status")
