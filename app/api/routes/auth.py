@@ -27,6 +27,9 @@ def login(data: LoginRequest, db: Session = Depends(get_db)):
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
+    if not user.is_active:
+        raise HTTPException(status_code=403, detail="Account is inactive. Contact your administrator.")
+
     # 2. Obtener organización activa del usuario
     org_user = db.query(OrganizationUser).filter(
         OrganizationUser.user_id == user.id
