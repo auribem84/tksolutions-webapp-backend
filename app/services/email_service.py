@@ -23,6 +23,21 @@ ses = boto3.client(
 )
 
 
+def send_onboarding_invite_email(to_email: str, form_link: str):
+    html = templates.get_template("email_onboarding_invite.html").render(
+        form_link=form_link,
+    )
+
+    ses.send_email(
+        Source=os.getenv("SES_FROM_EMAIL"),
+        Destination={"ToAddresses": [to_email]},
+        Message={
+            "Subject": {"Data": "Action Required: Complete Your Onboarding Form — Teknowsolutions"},
+            "Body": {"Html": {"Data": html}},
+        },
+    )
+
+
 def send_invitation_email(to_email: str, invite_link: str):
     html = templates.get_template("email_invitation.html").render(
         invite_link=invite_link,

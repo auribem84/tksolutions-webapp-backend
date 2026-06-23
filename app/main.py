@@ -23,7 +23,9 @@ from app.api.routes.admin import (
     organizations as admin_organizations,
     users as admin_users,
     services as admin_services,
+    doc_center,
 )
+from app.api.routes import onboarding
 from app.db.session import SessionLocal
 from app.db.seed import create_default_org
 
@@ -85,6 +87,8 @@ app.include_router(
     prefix="/admin/tools",
     tags=["Admin Tools"]
 )
+app.include_router(doc_center.router, prefix="/admin/doc-center", tags=["Doc Center"])
+app.include_router(onboarding.router, prefix="/onboarding", tags=["Onboarding"])
 
 # 🚀 STARTUP
 @app.on_event("startup")
