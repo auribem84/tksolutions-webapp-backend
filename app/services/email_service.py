@@ -32,7 +32,7 @@ def send_onboarding_invite_email(to_email: str, form_link: str):
         Source=os.getenv("SES_FROM_EMAIL"),
         Destination={"ToAddresses": [to_email]},
         Message={
-            "Subject": {"Data": "Action Required: Complete Your Onboarding Form — Teknowsolutions"},
+            "Subject": {"Data": "Action Required: Complete Your Client Discovery Form — Teknowsolutions"},
             "Body": {"Html": {"Data": html}},
         },
     )
