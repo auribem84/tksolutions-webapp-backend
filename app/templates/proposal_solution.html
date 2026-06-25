@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px 30px;
+      color: #111;
+      font-size: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 3px solid #2461db;
+      padding-bottom: 16px;
+    }
+    .logo { width: 130px; }
+    .doc-title {
+      font-size: 26px;
+      font-weight: bold;
+      color: #2461db;
+      text-align: right;
+    }
+    .doc-subtitle {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+      margin-top: 2px;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+    .label {
+      color: #2461db;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #dde4f5;
+      padding-bottom: 4px;
+    }
+    .value { margin-top: 3px; line-height: 1.6; }
+    .section { margin-bottom: 20px; }
+    .section-text {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      padding: 10px 12px;
+      background: #f9fafb;
+      border-left: 3px solid #2461db;
+      font-size: 11px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    th {
+      background: #2461db;
+      color: #fff;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 11px;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 11px;
+    }
+    td.amount { text-align: right; }
+    th.amount { text-align: right; }
+    .total-box {
+      margin-top: 16px;
+      width: 260px;
+      margin-left: auto;
+      border-top: 2px solid #2461db;
+      padding-top: 8px;
+    }
+    .total-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 5px 0;
+      font-size: 12px;
+    }
+    .grand-total {
+      font-size: 15px;
+      font-weight: bold;
+      border-top: 1px solid #ccc;
+      padding-top: 8px;
+      margin-top: 4px;
+    }
+    .meta-row {
+      display: flex;
+      gap: 40px;
+      margin: 16px 0 20px 0;
+      background: #f4f7ff;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+    .meta-item { }
+    .meta-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-value { font-size: 12px; font-weight: bold; color: #111; margin-top: 2px; }
+    .footer {
+      margin-top: 60px;
+      font-size: 9px;
+      color: #aaa;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .validity-notice {
+      margin-top: 20px;
+      font-size: 10px;
+      color: #666;
+      font-style: italic;
+    }
+    .signature-block {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .sig-line {
+      border-top: 1px solid #333;
+      padding-top: 6px;
+      font-size: 10px;
+      color: #555;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <img src="{{ logo_path }}" class="logo" />
+    </div>
+    <div>
+      <div class="doc-title">SOLUTION PROPOSAL</div>
+      <div class="doc-subtitle">Teknowsolutions, LLC — IT Consulting</div>
+    </div>
+  </div>
+
+  <!-- META -->
+  <div class="meta-row">
+    <div class="meta-item">
+      <div class="meta-label">Proposal No.</div>
+      <div class="meta-value">#PROP-{{ proposal.short_id }}</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Date Issued</div>
+      <div class="meta-value">{{ proposal.issued_date }}</div>
+    </div>
+    {% if proposal.valid_until %}
+    <div class="meta-item">
+      <div class="meta-label">Valid Until</div>
+      <div class="meta-value">{{ proposal.valid_until }}</div>
+    </div>
+    {% endif %}
+    {% if proposal.timeline_start %}
+    <div class="meta-item">
+      <div class="meta-label">Proposed Start</div>
+      <div class="meta-value">{{ proposal.timeline_start }}</div>
+    </div>
+    {% endif %}
+    {% if proposal.timeline_duration %}
+    <div class="meta-item">
+      <div class="meta-label">Est. Duration</div>
+      <div class="meta-value">{{ proposal.timeline_duration }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- FROM / TO -->
+  <div class="two-col">
+    <div>
+      <div class="label">From</div>
+      <div class="value"><strong>Teknowsolutions, LLC</strong></div>
+      <div class="value">3332 Robert Trent Jones Dr, Unit 109</div>
+      <div class="value">Orlando, FL 32835</div>
+      <div class="value">auribe@teknowsolutions.com</div>
+      <div class="value">EIN: 99-0970263</div>
+    </div>
+    <div>
+      <div class="label">Prepared For</div>
+      <div class="value"><strong>{{ proposal.client_name }}</strong></div>
+      <div class="value">{{ proposal.client_email }}</div>
+    </div>
+  </div>
+
+  <!-- PROJECT TITLE -->
+  <div class="section">
+    <div class="label">Project</div>
+    <div class="value" style="font-size:15px; font-weight:bold; color:#1a3a7a; margin-top:4px;">
+      {{ proposal.project_title }}
+    </div>
+  </div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  {% if proposal.executive_summary %}
+  <div class="section">
+    <div class="label">Executive Summary</div>
+    <div class="section-text">{{ proposal.executive_summary }}</div>
+  </div>
+  {% endif %}
+
+  <!-- SCOPE OF WORK -->
+  {% if proposal.scope_of_work %}
+  <div class="section">
+    <div class="label">Scope of Work</div>
+    <div class="section-text">{{ proposal.scope_of_work }}</div>
+  </div>
+  {% endif %}
+
+  <!-- PROPOSED SOLUTION -->
+  {% if proposal.proposed_solution %}
+  <div class="section">
+    <div class="label">Proposed Solution</div>
+    <div class="section-text">{{ proposal.proposed_solution }}</div>
+  </div>
+  {% endif %}
+
+  <!-- INVESTMENT -->
+  {% if proposal.line_items %}
+  <div class="section">
+    <div class="label">Investment</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="amount">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for item in proposal.line_items %}
+        <tr>
+          <td>{{ item.description }}</td>
+          <td class="amount">${{ "%.2f"|format(item.amount) }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    <div class="total-box">
+      <div class="total-row grand-total">
+        <span>Total Investment</span>
+        <span>${{ "%.2f"|format(proposal.total) }}</span>
+      </div>
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- PAYMENT TERMS -->
+  {% if proposal.payment_terms %}
+  <div class="section">
+    <div class="label">Payment Terms</div>
+    <div class="value">{{ proposal.payment_terms }}</div>
+  </div>
+  {% endif %}
+
+  <!-- NOTES -->
+  {% if proposal.notes %}
+  <div class="section">
+    <div class="label">Notes / Additional Terms</div>
+    <div class="section-text">{{ proposal.notes }}</div>
+  </div>
+  {% endif %}
+
+  <!-- VALIDITY -->
+  {% if proposal.valid_until %}
+  <div class="validity-notice">
+    This proposal is valid until {{ proposal.valid_until }}. Prices and availability are subject to change after this date.
+  </div>
+  {% endif %}
+
+  <!-- SIGNATURES -->
+  <div class="signature-block">
+    <div>
+      <div class="label">Teknowsolutions, LLC</div>
+      <div class="sig-line">Authorized Signature / Date</div>
+    </div>
+    <div>
+      <div class="label">{{ proposal.client_name }}</div>
+      <div class="sig-line">Client Signature / Date</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Teknowsolutions, LLC · Orlando, FL · auribe@teknowsolutions.com · EIN: 99-0970263
+  </div>
+
+</body>
+</html>

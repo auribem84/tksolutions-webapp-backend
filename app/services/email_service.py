@@ -23,6 +23,47 @@ ses = boto3.client(
 )
 
 
+def send_proposal_email(
+    to_email: str,
+    subject: str,
+    client_name: str,
+    proposal_type: str,
+    pdf_bytes: bytes,
+    filename: str,
+):
+    if proposal_type == "support":
+        body_html = f"""
+        <p>Dear {client_name},</p>
+        <p>Please find attached your <strong>Support &amp; Maintenance Proposal</strong> from Teknowsolutions, LLC.</p>
+        <p>Please review the attached document and feel free to reach out with any questions.</p>
+        <p>Best regards,<br/>Teknowsolutions, LLC</p>
+        """
+    else:
+        body_html = f"""
+        <p>Dear {client_name},</p>
+        <p>Please find attached your <strong>Solution Proposal</strong> from Teknowsolutions, LLC.</p>
+        <p>Please review the attached document and feel free to reach out with any questions.</p>
+        <p>Best regards,<br/>Teknowsolutions, LLC</p>
+        """
+
+    message = MIMEMultipart()
+    message["Subject"] = subject
+    message["From"] = os.getenv("SES_FROM_EMAIL")
+    message["To"] = to_email
+
+    message.attach(MIMEText(body_html, "html"))
+
+    attachment = MIMEApplication(pdf_bytes)
+    attachment.add_header("Content-Disposition", "attachment", filename=filename)
+    message.attach(attachment)
+
+    ses.send_raw_email(
+        Source=os.getenv("SES_FROM_EMAIL"),
+        Destinations=[to_email],
+        RawMessage={"Data": message.as_string()},
+    )
+
+
 def send_onboarding_invite_email(to_email: str, form_link: str):
     html = templates.get_template("email_onboarding_invite.html").render(
         form_link=form_link,

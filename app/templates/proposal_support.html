@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8" />
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      padding: 20px 30px;
+      color: #111;
+      font-size: 12px;
+    }
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+      border-bottom: 3px solid #2461db;
+      padding-bottom: 16px;
+    }
+    .logo { width: 130px; }
+    .doc-title {
+      font-size: 22px;
+      font-weight: bold;
+      color: #2461db;
+      text-align: right;
+    }
+    .doc-subtitle {
+      font-size: 11px;
+      color: #666;
+      text-align: right;
+      margin-top: 2px;
+    }
+    .two-col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin: 20px 0;
+    }
+    .label {
+      color: #2461db;
+      font-size: 10px;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 4px;
+      border-bottom: 1px solid #dde4f5;
+      padding-bottom: 4px;
+    }
+    .value { margin-top: 3px; line-height: 1.6; }
+    .section { margin-bottom: 20px; }
+    .section-text {
+      white-space: pre-wrap;
+      line-height: 1.7;
+      padding: 10px 12px;
+      background: #f9fafb;
+      border-left: 3px solid #2461db;
+      font-size: 11px;
+    }
+    .tier-badge {
+      display: inline-block;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-weight: bold;
+      font-size: 13px;
+      margin-top: 6px;
+    }
+    .tier-basic    { background: #e0f2fe; color: #0369a1; }
+    .tier-standard { background: #dcfce7; color: #166534; }
+    .tier-premium  { background: #fef9c3; color: #854d0e; }
+    .tier-custom   { background: #ede9fe; color: #5b21b6; }
+    .meta-row {
+      display: flex;
+      gap: 40px;
+      margin: 16px 0 20px 0;
+      background: #f4f7ff;
+      padding: 10px 14px;
+      border-radius: 4px;
+    }
+    .meta-label { font-size: 9px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .meta-value { font-size: 12px; font-weight: bold; color: #111; margin-top: 2px; }
+    .pricing-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-top: 8px;
+    }
+    .price-card {
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px;
+      text-align: center;
+    }
+    .price-label { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+    .price-amount { font-size: 24px; font-weight: bold; color: #2461db; margin-top: 4px; }
+    .price-period { font-size: 10px; color: #666; margin-top: 2px; }
+    .sla-box {
+      padding: 10px 14px;
+      background: #fff7ed;
+      border-left: 3px solid #f97316;
+      margin-top: 6px;
+      font-weight: bold;
+      color: #7c2d12;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+    }
+    th {
+      background: #2461db;
+      color: #fff;
+      text-align: left;
+      padding: 10px 12px;
+      font-size: 11px;
+    }
+    td {
+      padding: 9px 12px;
+      border-bottom: 1px solid #eee;
+      font-size: 11px;
+    }
+    .footer {
+      margin-top: 60px;
+      font-size: 9px;
+      color: #aaa;
+      text-align: center;
+      border-top: 1px solid #eee;
+      padding-top: 10px;
+    }
+    .signature-block {
+      margin-top: 40px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 40px;
+    }
+    .sig-line {
+      border-top: 1px solid #333;
+      padding-top: 6px;
+      font-size: 10px;
+      color: #555;
+      margin-top: 30px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <div>
+      <img src="{{ logo_path }}" class="logo" />
+    </div>
+    <div>
+      <div class="doc-title">SUPPORT &amp; MAINTENANCE PROPOSAL</div>
+      <div class="doc-subtitle">Teknowsolutions, LLC — IT Consulting</div>
+    </div>
+  </div>
+
+  <!-- META -->
+  <div class="meta-row">
+    <div class="meta-item">
+      <div class="meta-label">Proposal No.</div>
+      <div class="meta-value">#SUPP-{{ proposal.short_id }}</div>
+    </div>
+    <div class="meta-item">
+      <div class="meta-label">Date Issued</div>
+      <div class="meta-value">{{ proposal.issued_date }}</div>
+    </div>
+    {% if proposal.start_date %}
+    <div class="meta-item">
+      <div class="meta-label">Contract Start</div>
+      <div class="meta-value">{{ proposal.start_date }}</div>
+    </div>
+    {% endif %}
+    {% if proposal.contract_duration %}
+    <div class="meta-item">
+      <div class="meta-label">Duration</div>
+      <div class="meta-value">{{ proposal.contract_duration }}</div>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- FROM / TO -->
+  <div class="two-col">
+    <div>
+      <div class="label">From</div>
+      <div class="value"><strong>Teknowsolutions, LLC</strong></div>
+      <div class="value">3332 Robert Trent Jones Dr, Unit 109</div>
+      <div class="value">Orlando, FL 32835</div>
+      <div class="value">auribe@teknowsolutions.com</div>
+      <div class="value">EIN: 99-0970263</div>
+    </div>
+    <div>
+      <div class="label">Prepared For</div>
+      <div class="value"><strong>{{ proposal.client_name }}</strong></div>
+      <div class="value">{{ proposal.client_email }}</div>
+    </div>
+  </div>
+
+  <!-- PLATFORM -->
+  <div class="section">
+    <div class="label">Platform / System</div>
+    <div class="value" style="font-size:15px; font-weight:bold; color:#1a3a7a; margin-top:4px;">
+      {{ proposal.platform_name }}
+    </div>
+    {% if proposal.platform_description %}
+    <div class="value" style="margin-top:6px; color:#444;">{{ proposal.platform_description }}</div>
+    {% endif %}
+  </div>
+
+  <!-- SUPPORT TIER -->
+  {% if proposal.support_tier %}
+  <div class="section">
+    <div class="label">Support Tier</div>
+    {% set tier_lower = proposal.support_tier | lower %}
+    <div class="tier-badge tier-{{ tier_lower }}">{{ proposal.support_tier }}</div>
+  </div>
+  {% endif %}
+
+  <!-- SERVICES INCLUDED -->
+  {% if proposal.services_included %}
+  <div class="section">
+    <div class="label">Services Included</div>
+    <div class="section-text">{{ proposal.services_included }}</div>
+  </div>
+  {% endif %}
+
+  <!-- RESPONSE TIME SLA -->
+  {% if proposal.response_time_sla %}
+  <div class="section">
+    <div class="label">Response Time SLA</div>
+    <div class="sla-box">{{ proposal.response_time_sla }}</div>
+  </div>
+  {% endif %}
+
+  <!-- PRICING -->
+  {% if proposal.monthly_cost or proposal.annual_cost %}
+  <div class="section">
+    <div class="label">Pricing</div>
+    <div class="pricing-grid">
+      {% if proposal.monthly_cost %}
+      <div class="price-card">
+        <div class="price-label">Monthly</div>
+        <div class="price-amount">${{ "%.2f"|format(proposal.monthly_cost) }}</div>
+        <div class="price-period">per month</div>
+      </div>
+      {% endif %}
+      {% if proposal.annual_cost %}
+      <div class="price-card">
+        <div class="price-label">Annual</div>
+        <div class="price-amount">${{ "%.2f"|format(proposal.annual_cost) }}</div>
+        <div class="price-period">per year</div>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+  {% endif %}
+
+  <!-- NOTES -->
+  {% if proposal.notes %}
+  <div class="section">
+    <div class="label">Special Terms / Notes</div>
+    <div class="section-text">{{ proposal.notes }}</div>
+  </div>
+  {% endif %}
+
+  <!-- SIGNATURES -->
+  <div class="signature-block">
+    <div>
+      <div class="label">Teknowsolutions, LLC</div>
+      <div class="sig-line">Authorized Signature / Date</div>
+    </div>
+    <div>
+      <div class="label">{{ proposal.client_name }}</div>
+      <div class="sig-line">Client Signature / Date</div>
+    </div>
+  </div>
+
+  <div class="footer">
+    Teknowsolutions, LLC · Orlando, FL · auribe@teknowsolutions.com · EIN: 99-0970263
+  </div>
+
+</body>
+</html>

@@ -24,6 +24,7 @@ from app.api.routes.admin import (
     users as admin_users,
     services as admin_services,
     doc_center,
+    proposals,
 )
 from app.api.routes import onboarding
 from app.db.session import SessionLocal
@@ -88,6 +89,7 @@ app.include_router(
     tags=["Admin Tools"]
 )
 app.include_router(doc_center.router, prefix="/admin/doc-center", tags=["Doc Center"])
+app.include_router(proposals.router, prefix="/admin/proposals", tags=["Proposals"])
 app.include_router(onboarding.router, prefix="/onboarding", tags=["Onboarding"])
 
 # 🚀 STARTUP
