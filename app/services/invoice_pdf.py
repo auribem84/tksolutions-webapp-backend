@@ -3,6 +3,7 @@ from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 
 from app.models.organization_profile import OrganizationProfile
+from app.models.invoice_details import InvoiceDetail
 
 import os
 
@@ -53,7 +54,6 @@ def serialize_invoice(invoice, db):
             "email": profile.email if profile else "",
         },
 
-        # ✅ FLATTEN invoice fields (IMPORTANT)
         "description": invoice.description,
         "amount": float(invoice.amount),
         "status": invoice.status.capitalize() if invoice.status else "",
@@ -67,6 +67,19 @@ def serialize_invoice(invoice, db):
             if invoice.created_at
             else None
         ),
+        "line_items": [
+            {
+                "title": d.title,
+                "description": d.description or "",
+                "quantity": d.quantity,
+                "unit_price": float(d.unit_price),
+                "total": float(d.total),
+            }
+            for d in db.query(InvoiceDetail)
+                        .filter(InvoiceDetail.invoice_id == str(invoice.id))
+                        .order_by(InvoiceDetail.id)
+                        .all()
+        ],
     }
 
 

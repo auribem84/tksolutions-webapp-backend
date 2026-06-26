@@ -70,21 +70,39 @@ def services(
 
 @router.get("/{org_id}/invoices")
 def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    from app.models.invoice_details import InvoiceDetail
 
-    invoices = db.query(Invoice).filter(
+    rows = db.query(Invoice).filter(
         Invoice.organization_id == org_id
-    ).all()
+    ).order_by(Invoice.created_at.desc()).all()
 
-    return [
-        {
+    result = []
+    for i in rows:
+        details = (
+            db.query(InvoiceDetail)
+            .filter(InvoiceDetail.invoice_id == str(i.id))
+            .order_by(InvoiceDetail.id)
+            .all()
+        )
+        result.append({
             "id": str(i.id),
             "amount": float(i.amount),
             "description": i.description,
             "status": i.status,
+            "due_date": i.due_date.isoformat() if i.due_date else None,
             "created_at": i.created_at.isoformat() if i.created_at else None,
-        }
-        for i in invoices
-    ]
+            "line_items": [
+                {
+                    "title": d.title,
+                    "description": d.description or "",
+                    "quantity": d.quantity,
+                    "unit_price": float(d.unit_price),
+                    "total": float(d.total),
+                }
+                for d in details
+            ],
+        })
+    return result
 
 
 def _next_billing(day: int, from_date: datetime) -> datetime:

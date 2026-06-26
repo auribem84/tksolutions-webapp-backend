@@ -23,3 +23,4 @@ class Invoice(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
     organization = relationship("Organization")
+    details = relationship("InvoiceDetail", cascade="all, delete-orphan", order_by="InvoiceDetail.id")

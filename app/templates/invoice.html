@@ -249,16 +249,31 @@
 
     <thead>
       <tr>
+        <th style="width:40%">Item</th>
         <th>Description</th>
-        <th>Amount</th>
+        <th style="text-align:center">Qty</th>
+        <th style="text-align:right">Unit Price</th>
+        <th style="text-align:right">Total</th>
       </tr>
     </thead>
 
     <tbody>
-      <tr>
-        <td>{{ invoice.description }}</td>
-        <td>${{ "%.2f"|format(invoice.amount) }}</td>
-      </tr>
+      {% if invoice.line_items %}
+        {% for item in invoice.line_items %}
+        <tr>
+          <td><strong>{{ item.title }}</strong></td>
+          <td style="color:#555;font-size:11px">{{ item.description }}</td>
+          <td style="text-align:center">{{ item.quantity }}</td>
+          <td style="text-align:right">${{ "%.2f"|format(item.unit_price) }}</td>
+          <td style="text-align:right">${{ "%.2f"|format(item.total) }}</td>
+        </tr>
+        {% endfor %}
+      {% else %}
+        <tr>
+          <td colspan="4">{{ invoice.description }}</td>
+          <td style="text-align:right">${{ "%.2f"|format(invoice.amount) }}</td>
+        </tr>
+      {% endif %}
     </tbody>
 
   </table>
