@@ -1,8 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from datetime import datetime, date
+from dateutil.relativedelta import relativedelta
+import uuid
 
 from app.api.deps import get_db, require_default_admin
 from app.models.invoice import Invoice
+from app.models.recurring_invoice import RecurringInvoice
 from app.models.project import Project
 from app.models.ticket import Ticket, TicketMessage
 from app.models.organization import Organization
@@ -81,6 +85,132 @@ def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_de
         }
         for i in invoices
     ]
+
+
+def _next_billing(day: int, from_date: datetime) -> datetime:
+    """Return the next occurrence of day-of-month on or after from_date."""
+    candidate = from_date.replace(day=min(day, 28))
+    if candidate < from_date:
+        candidate = (from_date + relativedelta(months=1)).replace(day=min(day, 28))
+    return candidate
+
+
+def _advance(dt: datetime, frequency: str) -> datetime:
+    if frequency == "quarterly":
+        return dt + relativedelta(months=3)
+    if frequency == "annually":
+        return dt + relativedelta(years=1)
+    return dt + relativedelta(months=1)
+
+
+def _serialize_recurring(r: RecurringInvoice) -> dict:
+    return {
+        "id": str(r.id),
+        "organization_id": str(r.organization_id),
+        "description": r.description,
+        "amount": float(r.amount),
+        "frequency": r.frequency,
+        "day_of_month": r.day_of_month,
+        "start_date": r.start_date.isoformat() if r.start_date else None,
+        "next_billing_date": r.next_billing_date.isoformat() if r.next_billing_date else None,
+        "is_active": r.is_active,
+        "created_at": r.created_at.isoformat() if r.created_at else None,
+    }
+
+
+@router.get("/{org_id}/recurring-invoices")
+def get_recurring_invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    rows = db.query(RecurringInvoice).filter(
+        RecurringInvoice.organization_id == org_id
+    ).order_by(RecurringInvoice.created_at.desc()).all()
+    return [_serialize_recurring(r) for r in rows]
+
+
+@router.post("/{org_id}/recurring-invoices")
+def create_recurring_invoice(org_id: str, data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    frequency = data.get("frequency", "monthly")
+    day = int(data.get("day_of_month", 1))
+    start_raw = data.get("start_date")
+    start_dt = datetime.fromisoformat(start_raw) if start_raw else datetime.utcnow()
+
+    if frequency == "monthly":
+        next_bill = _next_billing(day, start_dt)
+    else:
+        next_bill = start_dt
+
+    rec = RecurringInvoice(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        description=data.get("description"),
+        amount=float(data["amount"]),
+        frequency=frequency,
+        day_of_month=day,
+        start_date=start_dt,
+        next_billing_date=next_bill,
+        is_active=data.get("is_active", True),
+    )
+    db.add(rec)
+    db.commit()
+    db.refresh(rec)
+    return _serialize_recurring(rec)
+
+
+@router.patch("/{org_id}/recurring-invoices/{rec_id}")
+def update_recurring_invoice(org_id: str, rec_id: str, data: dict, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    rec = db.query(RecurringInvoice).filter(
+        RecurringInvoice.id == rec_id,
+        RecurringInvoice.organization_id == org_id,
+    ).first()
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recurring invoice not found")
+
+    for field in ("description", "amount", "frequency", "day_of_month", "is_active", "next_billing_date"):
+        if field in data:
+            setattr(rec, field, data[field])
+
+    db.commit()
+    db.refresh(rec)
+    return _serialize_recurring(rec)
+
+
+@router.delete("/{org_id}/recurring-invoices/{rec_id}", status_code=204)
+def delete_recurring_invoice(org_id: str, rec_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    rec = db.query(RecurringInvoice).filter(
+        RecurringInvoice.id == rec_id,
+        RecurringInvoice.organization_id == org_id,
+    ).first()
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recurring invoice not found")
+    db.delete(rec)
+    db.commit()
+
+
+@router.post("/{org_id}/recurring-invoices/{rec_id}/generate")
+def generate_now(org_id: str, rec_id: str, db: Session = Depends(get_db), user=Depends(require_default_admin)):
+    """Manually trigger one billing cycle: creates a regular invoice and advances next_billing_date."""
+    rec = db.query(RecurringInvoice).filter(
+        RecurringInvoice.id == rec_id,
+        RecurringInvoice.organization_id == org_id,
+    ).first()
+    if not rec:
+        raise HTTPException(status_code=404, detail="Recurring invoice not found")
+
+    from datetime import timedelta
+    invoice = Invoice(
+        id=uuid.uuid4(),
+        organization_id=org_id,
+        amount=rec.amount,
+        description=rec.description,
+        status="pending",
+        due_date=datetime.utcnow() + timedelta(days=15),
+    )
+    db.add(invoice)
+
+    base = rec.next_billing_date or datetime.utcnow()
+    rec.next_billing_date = _advance(base, rec.frequency)
+
+    db.commit()
+    return {"invoice_id": str(invoice.id), "next_billing_date": rec.next_billing_date.isoformat()}
 
 
 @router.get("/{org_id}/projects")
