@@ -27,7 +27,6 @@ def _save_line_items(db: Session, invoice_id, line_items: list) -> float:
             description=item.get("description", ""),
             quantity=int(qty),
             unit_price=price,
-            total=item_total,
         ))
     return total
 
