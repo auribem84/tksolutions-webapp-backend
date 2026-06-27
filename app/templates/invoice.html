@@ -47,19 +47,39 @@
       width: 100%;
       border-collapse: collapse;
       margin-top: 20px;
+      table-layout: fixed;
     }
 
     th {
       background: #f4f4f4;
       text-align: left;
-      padding: 12px;
-      font-size: 13px;
+      padding: 10px 12px;
+      font-size: 12px;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
     }
 
     td {
-      padding: 12px;
+      padding: 10px 12px;
       border-bottom: 1px solid #eee;
+      vertical-align: top;
+      word-wrap: break-word;
+      overflow-wrap: break-word;
+      font-size: 12px;
     }
+
+    td.item-title {
+      font-weight: bold;
+    }
+
+    td.item-desc {
+      color: #555;
+      font-size: 11px;
+      white-space: pre-wrap;
+    }
+
+    td.center { text-align: center; }
+    td.right  { text-align: right; }
 
     .total-box {
       margin-top: 30px;
@@ -246,10 +266,17 @@
   </div>
 
   <table>
+    <colgroup>
+      <col style="width:28%" />
+      <col style="width:34%" />
+      <col style="width:8%"  />
+      <col style="width:14%" />
+      <col style="width:16%" />
+    </colgroup>
 
     <thead>
       <tr>
-        <th style="width:40%">Item</th>
+        <th>Item</th>
         <th>Description</th>
         <th style="text-align:center">Qty</th>
         <th style="text-align:right">Unit Price</th>
@@ -261,17 +288,19 @@
       {% if invoice.line_items %}
         {% for item in invoice.line_items %}
         <tr>
-          <td><strong>{{ item.title }}</strong></td>
-          <td style="color:#555;font-size:11px">{{ item.description }}</td>
-          <td style="text-align:center">{{ item.quantity }}</td>
-          <td style="text-align:right">${{ "%.2f"|format(item.unit_price) }}</td>
-          <td style="text-align:right">${{ "%.2f"|format(item.total) }}</td>
+          <td class="item-title">{{ item.title }}</td>
+          <td class="item-desc">{{ item.description }}</td>
+          <td class="center">{{ item.quantity }}</td>
+          <td class="right">${{ "%.2f"|format(item.unit_price) }}</td>
+          <td class="right">${{ "%.2f"|format(item.total) }}</td>
         </tr>
         {% endfor %}
       {% else %}
         <tr>
-          <td colspan="4">{{ invoice.description }}</td>
-          <td style="text-align:right">${{ "%.2f"|format(invoice.amount) }}</td>
+          <td class="item-title" colspan="2">{{ invoice.description }}</td>
+          <td class="center">1</td>
+          <td class="right">${{ "%.2f"|format(invoice.amount) }}</td>
+          <td class="right">${{ "%.2f"|format(invoice.amount) }}</td>
         </tr>
       {% endif %}
     </tbody>
