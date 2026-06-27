@@ -31,7 +31,7 @@ def _save_line_items(db: Session, invoice_id, line_items: list) -> float:
     return total
 
 
-@router.post("/")
+@router.post("")
 def create_invoice(
     data: dict,
     db: Session = Depends(get_db),
