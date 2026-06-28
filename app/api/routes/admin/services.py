@@ -8,7 +8,7 @@ from app.models.service import Service
 router = APIRouter()
 
 
-@router.post("/")
+@router.post("")
 def create_service(
     data: dict,
     db: Session = Depends(get_db),

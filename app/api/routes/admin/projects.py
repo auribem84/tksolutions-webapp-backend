@@ -17,7 +17,7 @@ def _generate_project_tag(db: Session) -> str:
     return f"{prefix}{count + 1:04d}"
 
 
-@router.post("/")
+@router.post("")
 def create_project_with_tasks(
     data: dict,
     db: Session = Depends(get_db),
