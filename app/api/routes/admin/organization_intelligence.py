@@ -129,6 +129,7 @@ def _serialize_recurring(r: RecurringInvoice) -> dict:
         "organization_id": str(r.organization_id),
         "description": r.description,
         "amount": float(r.amount),
+        "line_items": r.line_items or [],
         "frequency": r.frequency,
         "day_of_month": r.day_of_month,
         "start_date": r.start_date.isoformat() if r.start_date else None,
@@ -158,11 +159,18 @@ def create_recurring_invoice(org_id: str, data: dict, db: Session = Depends(get_
     else:
         next_bill = start_dt
 
+    line_items = data.get("line_items") or []
+    amount = (
+        sum(float(i.get("quantity", 1)) * float(i.get("unit_price", 0)) for i in line_items)
+        if line_items else float(data.get("amount", 0))
+    )
+
     rec = RecurringInvoice(
         id=uuid.uuid4(),
         organization_id=org_id,
         description=data.get("description"),
-        amount=float(data["amount"]),
+        amount=amount,
+        line_items=line_items or None,
         frequency=frequency,
         day_of_month=day,
         start_date=start_dt,
@@ -184,7 +192,13 @@ def update_recurring_invoice(org_id: str, rec_id: str, data: dict, db: Session =
     if not rec:
         raise HTTPException(status_code=404, detail="Recurring invoice not found")
 
-    for field in ("description", "amount", "frequency", "day_of_month", "is_active", "next_billing_date"):
+    if "line_items" in data:
+        line_items = data["line_items"] or []
+        rec.line_items = line_items or None
+        rec.amount = sum(
+            float(i.get("quantity", 1)) * float(i.get("unit_price", 0)) for i in line_items
+        ) if line_items else rec.amount
+    for field in ("description", "frequency", "day_of_month", "is_active", "next_billing_date"):
         if field in data:
             setattr(rec, field, data[field])
 
@@ -216,6 +230,8 @@ def generate_now(org_id: str, rec_id: str, db: Session = Depends(get_db), user=D
         raise HTTPException(status_code=404, detail="Recurring invoice not found")
 
     from datetime import timedelta
+    from app.models.invoice_details import InvoiceDetail
+
     invoice = Invoice(
         id=uuid.uuid4(),
         organization_id=org_id,
@@ -225,6 +241,18 @@ def generate_now(org_id: str, rec_id: str, db: Session = Depends(get_db), user=D
         due_date=datetime.utcnow() + timedelta(days=15),
     )
     db.add(invoice)
+    db.flush()
+
+    if rec.line_items:
+        for item in rec.line_items:
+            db.add(InvoiceDetail(
+                id=uuid.uuid4(),
+                invoice_id=invoice.id,
+                title=item.get("title", ""),
+                description=item.get("description", ""),
+                quantity=int(item.get("quantity", 1)),
+                unit_price=float(item.get("unit_price", 0)),
+            ))
 
     base = rec.next_billing_date or datetime.utcnow()
     rec.next_billing_date = _advance(base, rec.frequency)

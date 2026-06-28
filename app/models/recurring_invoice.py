@@ -1,4 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey, Boolean, Integer, DateTime, Text, Numeric
+from sqlalchemy import Column, String, ForeignKey, Boolean, Integer, DateTime, Text, Numeric, JSON
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
 import uuid
@@ -15,6 +15,7 @@ class RecurringInvoice(Base):
 
     description = Column(Text, nullable=True)
     amount = Column(Numeric(10, 2), nullable=False)
+    line_items = Column(JSON, nullable=True)
     frequency = Column(String, default="monthly")  # monthly, quarterly, annually
     day_of_month = Column(Integer, default=1)       # 1–28, used for monthly billing
 
