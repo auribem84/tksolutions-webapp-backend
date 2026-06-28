@@ -68,14 +68,15 @@
       font-size: 12px;
     }
 
-    td.item-title {
+    .item-title {
       font-weight: bold;
     }
 
-    td.item-desc {
+    .item-desc {
       color: #555;
       font-size: 11px;
       white-space: pre-wrap;
+      margin-top: 3px;
     }
 
     td.center { text-align: center; }
@@ -267,17 +268,15 @@
 
   <table>
     <colgroup>
-      <col style="width:28%" />
-      <col style="width:34%" />
-      <col style="width:8%"  />
-      <col style="width:14%" />
+      <col style="width:58%" />
+      <col style="width:10%"  />
+      <col style="width:16%" />
       <col style="width:16%" />
     </colgroup>
 
     <thead>
       <tr>
         <th>Item</th>
-        <th>Description</th>
         <th style="text-align:center">Qty</th>
         <th style="text-align:right">Unit Price</th>
         <th style="text-align:right">Total</th>
@@ -288,8 +287,12 @@
       {% if invoice.line_items %}
         {% for item in invoice.line_items %}
         <tr>
-          <td class="item-title">{{ item.title }}</td>
-          <td class="item-desc">{{ item.description }}</td>
+          <td>
+            <div class="item-title">{{ item.title }}</div>
+            {% if item.description %}
+            <div class="item-desc">{{ item.description }}</div>
+            {% endif %}
+          </td>
           <td class="center">{{ item.quantity }}</td>
           <td class="right">${{ "%.2f"|format(item.unit_price) }}</td>
           <td class="right">${{ "%.2f"|format(item.total) }}</td>
@@ -297,7 +300,7 @@
         {% endfor %}
       {% else %}
         <tr>
-          <td class="item-title" colspan="2">{{ invoice.description }}</td>
+          <td class="item-title">{{ invoice.description }}</td>
           <td class="center">1</td>
           <td class="right">${{ "%.2f"|format(invoice.amount) }}</td>
           <td class="right">${{ "%.2f"|format(invoice.amount) }}</td>
