@@ -63,6 +63,7 @@ def services(
             "name": s.name,
             "description": s.description,
             "status": s.status,
+            "plan": s.plan,
         }
         for s in services
     ]

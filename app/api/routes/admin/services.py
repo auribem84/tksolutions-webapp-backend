@@ -20,6 +20,7 @@ def create_service(
         name=data["name"],
         description=data.get("description"),
         status=data.get("status", "active"),
+        plan=data.get("plan"),
     )
     db.add(service)
     db.commit()
@@ -44,6 +45,8 @@ def update_service(
         service.description = data["description"]
     if "status" in data:
         service.status = data["status"]
+    if "plan" in data:
+        service.plan = data["plan"]
 
     db.commit()
     return {"message": "Service updated"}
