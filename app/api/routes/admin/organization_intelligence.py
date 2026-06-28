@@ -86,6 +86,7 @@ def invoices(org_id: str, db: Session = Depends(get_db), user=Depends(require_de
         )
         result.append({
             "id": str(i.id),
+            "short_id": str(i.id).replace("-", "")[-6:].upper(),
             "amount": float(i.amount),
             "description": i.description,
             "status": i.status,

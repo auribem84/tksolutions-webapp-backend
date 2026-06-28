@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from fastapi.responses import StreamingResponse
+from fastapi.responses import StreamingResponse, Response
 from sqlalchemy.orm import Session
 from uuid import uuid4
 
@@ -116,8 +116,8 @@ def admin_download_invoice(
     invoice_data = serialize_invoice(invoice, db)
     pdf = generate_invoice_pdf(invoice_data)
 
-    return StreamingResponse(
-        pdf,
+    return Response(
+        content=pdf.getvalue(),
         media_type="application/pdf",
         headers={"Content-Disposition": f'attachment; filename="INV-{invoice_data["short_id"]}.pdf"'},
     )
