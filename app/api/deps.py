@@ -72,10 +72,10 @@ def get_current_user(
     )
 
     # DEBUG
-    print("DEBUG DEFAULT_ORG_ID:", DEFAULT_ORG_ID)
-    print("DEBUG ORG:", organization_id)
-    print("DEBUG ROLE:", role.name)
-    print("DEBUG RESULT:", is_default_org_admin)
+    # print("DEBUG DEFAULT_ORG_ID:", DEFAULT_ORG_ID)
+    # print("DEBUG ORG:", organization_id)
+    # print("DEBUG ROLE:", role.name)
+    # print("DEBUG RESULT:", is_default_org_admin)
 
     return {
         "user_id": str(user.id),
