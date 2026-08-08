@@ -38,6 +38,8 @@ class OnboardingSubmission(Base):
     # Signing authority
     signing_authority_name = Column(String)
     signing_authority_title = Column(String)
+    signing_authority_email = Column(String)
+    signing_authority_mobile = Column(String)
 
     # Primary contact
     primary_contact_name = Column(String)
