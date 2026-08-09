@@ -8,6 +8,10 @@ from app.api.deps import get_db, require_default_admin
 from app.models.organization import Organization
 from app.models.organization_profile import OrganizationProfile
 from app.models.organization_contact import OrganizationContact
+from app.models.user import User
+from app.models.role import Role
+from app.models.organization_user import OrganizationUser
+from app.core.security import hash_password
 
 from app.schemas.organization import (
     OrganizationCreateFull,
