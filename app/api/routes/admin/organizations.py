@@ -183,15 +183,13 @@ def create_organization_with_admin(
     # CREATE ADMIN USER
     # =========================================
 
+    name_parts = data.admin_name.strip().split(" ", 1)
     user = User(
         id=uuid.uuid4(),
-
         email=data.admin_email,
-
-        hashed_password=hash_password(
-            data.admin_password
-        ),
-
+        hashed_password=hash_password(data.admin_password),
+        user_name=name_parts[0],
+        user_lastname=name_parts[1] if len(name_parts) > 1 else "",
         is_active=True,
     )
 
