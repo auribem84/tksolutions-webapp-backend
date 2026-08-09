@@ -14,6 +14,7 @@ from app.schemas.organization import (
     OrganizationBootstrapCreate,
     OrganizationOut,
 )
+from app.services.email_service import send_welcome_email
 
 import uuid
 
@@ -224,6 +225,11 @@ def create_organization_with_admin(
     db.add(link)
 
     db.commit()
+
+    try:
+        send_welcome_email(to_email=data.admin_email, first_name=data.admin_name)
+    except Exception:
+        pass  # don't fail the request if email delivery fails
 
     return {
         "organization_id": org.id,
