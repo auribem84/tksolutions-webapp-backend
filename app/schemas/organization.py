@@ -79,12 +79,10 @@ class OrganizationBootstrapCreate(BaseModel):
     email: Optional[str] = None
 
     # =========================================
-    # ADMIN USER
+    # ADMIN USER (invitation only — no password set here)
     # =========================================
 
     admin_email: EmailStr
-    admin_password: str
-    admin_name: str
 
     # =========================================
     # CONTACTS

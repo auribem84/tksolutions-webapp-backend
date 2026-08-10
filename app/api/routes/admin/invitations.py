@@ -10,6 +10,7 @@ from app.models.invitation import Invitation
 from app.models.user import User
 from app.models.organization import Organization
 from app.models.organization_user import OrganizationUser
+from app.models.role import Role
 from app.models.user_legal_acceptance import UserLegalAcceptance
 from app.schemas.invitation import InvitationCreate, InvitationAccept
 from app.services.email_service import send_invitation_email, send_welcome_email
@@ -67,10 +68,20 @@ def accept_invitation(data: InvitationAccept, request: Request, db: Session = De
     db.add(user)
     db.flush()
 
+    if invitation.role == "admin":
+        role_obj = db.query(Role).filter(Role.name == "admin").first()
+        if not role_obj:
+            role_obj = Role(id=uuid4(), name="admin")
+            db.add(role_obj)
+            db.flush()
+        role_id = role_obj.id
+    else:
+        role_id = os.getenv("DEFAULT_ROLE_ID")
+
     org_user = OrganizationUser(
         user_id=user.id,
         organization_id=invitation.organization_id,
-        role_id=os.getenv("DEFAULT_ROLE_ID"),
+        role_id=role_id,
     )
     db.add(org_user)
 

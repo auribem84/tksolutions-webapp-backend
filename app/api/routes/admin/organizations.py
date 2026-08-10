@@ -8,10 +8,7 @@ from app.api.deps import get_db, require_default_admin
 from app.models.organization import Organization
 from app.models.organization_profile import OrganizationProfile
 from app.models.organization_contact import OrganizationContact
-from app.models.user import User
-from app.models.role import Role
-from app.models.organization_user import OrganizationUser
-from app.core.security import hash_password
+from app.models.invitation import Invitation
 
 from app.schemas.organization import (
     OrganizationCreateFull,
@@ -181,64 +178,33 @@ def create_organization_with_admin(
         db.add(new_contact)
 
     # =========================================
-    # CREATE ADMIN USER
+    # CREATE ADMIN INVITATION
     # =========================================
 
-    name_parts = data.admin_name.strip().split(" ", 1)
-    user = User(
-        id=uuid.uuid4(),
+    from datetime import datetime, timedelta
+    token = str(uuid.uuid4())
+
+    invitation = Invitation(
         email=data.admin_email,
-        hashed_password=hash_password(data.admin_password),
-        user_name=name_parts[0],
-        user_lastname=name_parts[1] if len(name_parts) > 1 else "",
-        is_active=True,
-    )
-
-    db.add(user)
-    db.flush()
-
-    # =========================================
-    # ENSURE ADMIN ROLE
-    # =========================================
-
-    admin_role = db.query(Role).filter(
-        Role.name == "admin"
-    ).first()
-
-    if not admin_role:
-
-        admin_role = Role(
-            id=uuid.uuid4(),
-            name="admin"
-        )
-
-        db.add(admin_role)
-        db.flush()
-
-    # =========================================
-    # LINK USER TO ORG
-    # =========================================
-
-    link = OrganizationUser(
-        user_id=user.id,
+        role="admin",
         organization_id=org.id,
-        role_id=admin_role.id,
+        token=token,
+        expires_at=datetime.utcnow() + timedelta(days=7),
     )
-
-    db.add(link)
+    db.add(invitation)
 
     db.commit()
 
     try:
         frontend_url = os.getenv("FRONTEND_URL", "https://my.teknowsolutions.com")
-        send_invitation_email(to_email=data.admin_email, invite_link=f"{frontend_url}/login")
+        invite_link = f"{frontend_url}/accept-invite?token={token}"
+        send_invitation_email(to_email=data.admin_email, invite_link=invite_link)
     except Exception:
         pass  # don't fail the request if email delivery fails
 
     return {
-        "organization_id": org.id,
-        "user_id": user.id,
-        "message": "Organization bootstrap successful"
+        "organization_id": str(org.id),
+        "message": "Organization created. Invitation email sent to admin."
     }
 
 
