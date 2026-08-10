@@ -18,9 +18,10 @@ from app.schemas.organization import (
     OrganizationBootstrapCreate,
     OrganizationOut,
 )
-from app.services.email_service import send_welcome_email
+from app.services.email_service import send_invitation_email
 
 import uuid
+import os
 
 router = APIRouter()
 
@@ -229,7 +230,8 @@ def create_organization_with_admin(
     db.commit()
 
     try:
-        send_welcome_email(to_email=data.admin_email, first_name=data.admin_name)
+        frontend_url = os.getenv("FRONTEND_URL", "https://my.teknowsolutions.com")
+        send_invitation_email(to_email=data.admin_email, invite_link=f"{frontend_url}/login")
     except Exception:
         pass  # don't fail the request if email delivery fails
 
